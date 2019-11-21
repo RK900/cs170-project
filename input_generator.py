@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import random
 import string
 import tempfile
@@ -48,8 +48,8 @@ def create_valid_test_input(N):
 
 def create_test_input(N, uniform=True, delete_edge_prob=0): # TODO Possible mutate inputs so that good inputs are updated
     matrix = [[0] * N] * N
-    for i in range(N/2):
-        for j in range(N/2):
+    for i in range(int(N/2)):
+        for j in range(int(N/2)):
             if i == j:
                 continue
             if np.random.uniform(0, 1) < delete_edge_prob:
@@ -67,8 +67,8 @@ def create_test_input(N, uniform=True, delete_edge_prob=0): # TODO Possible muta
             
     list_of_locations = [getUUIDLabel() for i in range(N)]
     numTA = round(np.random.uniform(0, N/2))
-    taLocIndex = np.random.choice(range(N), numTa)
-    list_of_homes = [randomNames[i] for i in taLocIndex]
+    taLocIndex = np.random.choice(range(N), numTA)
+    list_of_homes = [list_of_locations[i] for i in taLocIndex]
     start_car_position = list_of_locations[0]
     return len(list_of_locations), len(list_of_homes), list_of_locations, list_of_homes, start_car_position, matrix
 
