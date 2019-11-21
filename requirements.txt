@@ -1,0 +1,6 @@
+cffi==1.13.2
+decorator==4.4.1
+mip==1.5.3
+networkx==2.4
+numpy==1.17.4
+pycparser==2.19
