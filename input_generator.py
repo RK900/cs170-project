@@ -11,6 +11,40 @@ def getUUIDLabel():
    return str(uuid.uuid4())
 
 
+def save_test_to_file(N, num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix):
+    temp = create_temp_file(N)
+    num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
+        N)
+    temp.writelines(num_of_locations)
+    temp.writelines(len(num_houses))
+    temp.writelines("".join(list_locations))
+    temp.writelines("".join(list_houses))
+    temp.writelines(starting_car_location)
+    temp.writelines(" ".join([" ".join(row) for row in adjacency_matrix]))
+
+
+def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name="")
+    temp = create_temp_file(N, folder="outputs", prefix=input_file_name, file_extension=".out")
+    temp.writelines(" ".join(path_car_taken))
+    temp.writelines(len(list_drop_of_locs))
+    for drop_of_locs in list_drop_of_locs:
+        temp.writelines(" ".join(drop_of_locs))
+
+def create_temp_file(N, folder="inputs", prefix="", file_extension=".in"):
+    curr_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
+    temp_dir = dir_path + os.path.join(dir_path, folder, str(N))
+    temp = tempfile.NamedTemporaryFile(
+        delete=False, mode='w+t', prefix=prefix + "-{}".format(curr_time), dir=temp_dir, suffix=file_extension)
+    return temp
+
+def create_valid_test_input(N):
+    num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_test_input(
+        N)
+    while not quick_validate(num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix):
+           num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_test_input(
+               N)
+    return num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix
+
 
 def create_test_input(N, uniform=True, delete_edge_prob=0): # TODO Possible mutate inputs so that good inputs are updated
     matrix = [[0] * N] * N
