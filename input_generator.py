@@ -23,7 +23,7 @@ def save_test_to_file(N, num_of_locations, num_houses, list_locations, list_hous
     temp.writelines(" ".join([" ".join(row) for row in adjacency_matrix]))
 
 
-def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name="")
+def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
     temp = create_temp_file(N, folder="outputs", prefix=input_file_name, file_extension=".out")
     temp.writelines(" ".join(path_car_taken))
     temp.writelines(len(list_drop_of_locs))
