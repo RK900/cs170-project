@@ -4,7 +4,7 @@ sys.path.append('..')
 sys.path.append('../..')
 import argparse
 import utils
-
+from mip.model import *
 from student_utils import *
 """
 ======================================================================
@@ -25,7 +25,6 @@ def solve(list_of_locations, list_of_homes, starting_car_location, adjacency_mat
         A list of (location, [homes]) representing drop-offs
     """
     pass
-    
 
 """
 ======================================================================

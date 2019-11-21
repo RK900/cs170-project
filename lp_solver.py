@@ -74,3 +74,33 @@ def solve(graph, list_locations, list_houses, starting_car_location):
         if abs(v.x) > 1e-6:  # only printing non-zeros
             print('{} : {}'.format(v.name, v.x))
     return m.objective_value, m.objective_bound, x, T
+
+def get_path_car_taken_from_vars(x, T, list_locations, list_houses):
+    stack = Stack()
+    visited_edges = {}
+    path_car_taken = [loc]
+    for (u, v) in g.out_edges(loc):
+        if x[u][v].x >= 0.99:
+            stack.push(item)
+    while not stack.isEmpty():
+        (u, v) = stack.pop()
+        if v not in path:
+            path.append(v)
+        visited_edges.add((u,v))
+        for (u, v) in g.out_edges(v):
+            if x[u][v].x >= 0.99:
+                stack.push(item)
+    student_drop_off_locations = []
+
+    list_drop_of_locs = list_houses[:]
+    for loc in locations:
+        dropped_off = []
+        for ta in list_drop_of_locs[:]:
+            if T[ta][loc]:
+                dropped_off.append(ta)
+                list_drop_of_locs.remove(ta)
+        student_drop_off_locations.append(dropped_off)
+    for ta_left in list_drop_of_locs:
+        student_drop_off_locations.append([ta_left, ta_left])
+    return path_car_taken, list_drop_of_locs
+
