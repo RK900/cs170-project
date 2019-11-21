@@ -122,6 +122,66 @@ def tests(input_file, params=[]):
     return message, error
 
 
+def quick_validate(num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix):
+    if not all(name.isalnum() and len(name) <= MAX_NAME_LENGTH for name in list_locations):
+        return False
+
+    # check counts
+    if len(list_locations) != num_of_locations:
+        return False
+
+    if len(list_houses) != num_houses:
+        return False
+
+    if num_of_locations < num_houses:
+        return False
+
+    # check containment
+    if any(house not in list_locations for house in list_houses):
+        return False
+
+    if starting_car_location not in list_locations:
+        return False
+
+    # check distinct
+    if not len(set(list_locations)) == len(list_locations):
+        return False
+
+    if not len(set(list_houses)) == len(list_houses):
+        message += 'The names of your houses are not distinct.\n'
+        error = True
+
+    # check adjacency matrix
+    if not len(adjacency_matrix) == len(adjacency_matrix[0]) == num_of_locations:
+        return False
+
+    if not all(entry == 'x' or (type(entry) is float and entry > 0 and entry <= 2e9 and decimal_digits_check(entry)) for row in adjacency_matrix for entry in row):
+        return False
+
+    # if not square, terminate
+    if len(set(map(len, adjacency_matrix))) != 1 or len(adjacency_matrix[0]) != len(adjacency_matrix):
+       return False
+
+    adjacency_matrix_numpy = np.matrix(adjacency_matrix)
+
+    # check requirements on square matrix
+    if not np.all(adjacency_matrix_numpy.T == adjacency_matrix_numpy):
+        return False
+
+    G, adj_message = adjacency_matrix_to_graph(adjacency_matrix)
+
+    # if failed to create adjacency matrix, terminate
+    if adj_message:
+        return False
+
+    if not nx.is_connected(G):
+        return False
+
+    if not is_metric(G):
+        return False
+
+    return True
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parsing arguments')
     parser.add_argument('--all', action='store_true', help='If specified, the input validator is run on all files in the input directory. Else, it is run on just the given input file.')
