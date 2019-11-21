@@ -20,12 +20,12 @@ def save_test_to_file(N, num_of_locations, num_houses, list_locations, list_hous
 	temp = create_temp_file(N)
 	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
 		N)
-	temp.writelines(num_of_locations)
-	temp.writelines(len(num_houses))
-	temp.writelines("".join(list_locations))
-	temp.writelines("".join(list_houses))
-	temp.writelines(starting_car_location)
-	temp.writelines(" ".join([" ".join(row) for row in adjacency_matrix]))
+	temp.writelines(str(num_of_locations) + "\n")
+	temp.writelines(str(num_houses) + "\n")
+	temp.writelines(" ".join(list_locations) + "\n")
+	temp.writelines(" ".join(list_houses) + "\n")
+	temp.writelines(starting_car_location + "\n")
+	temp.writelines("\n".join([" ".join(map(str, row)) for row in adjacency_matrix]))
 
 
 def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
@@ -40,7 +40,7 @@ def create_temp_file(N, folder="inputs", prefix="", file_extension=".in"):
 	curr_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
 	temp_dir = os.path.join(dir_path, folder, str(N))
 	temp = tempfile.NamedTemporaryFile(
-		delete=False, mode='w+t', prefix=prefix + "-{}".format(curr_time), dir=temp_dir, suffix=file_extension)
+		delete=False, mode='w+t', prefix=prefix + "{}".format(curr_time), dir=temp_dir, suffix=file_extension)
 	return temp
 
 
@@ -55,19 +55,22 @@ def create_valid_test_input(N):
 
 
 def create_test_input(N, uniform=True,
-					  delete_edge_prob=0):  # TODO Possible mutate inputs so that good inputs are updated
-	matrix = [[0] * N] * N
-	for i in range(int(N / 2)):
-		for j in range(int(N / 2)):
-			print(i, j)
+					  delete_edge_prob=0.05):  # TODO Possible mutate inputs so that good inputs are updated
+	matrix = [[0.0] * N for i in range(N)]
+	for i in range(N):
+		for j in range(N):
 			if i == j:
+				matrix[i][j] = 'x'
+				matrix[j][i] = 'x'
 				continue
+
 			if np.random.uniform(0, 1) < delete_edge_prob:
 				matrix[i][j] = 'x'
 				matrix[j][i] = 'x'
-
-			if uniform:
-				uniformRes = np.random.uniform(0, 1)
+			elif uniform:
+				x = np.random.uniform(0, 1)
+				uniformRes = round(x, 5)
+				print(uniformRes)
 				matrix[i][j] = uniformRes
 				matrix[j][i] = uniformRes
 			else:
@@ -75,6 +78,8 @@ def create_test_input(N, uniform=True,
 				matrix[i][j] = expRes
 				matrix[j][i] = expRes
 
+	for item in matrix:
+		print(item)
 	list_of_locations = [getUUIDLabel() for i in range(N)]
 	numTA = round(np.random.uniform(0, N / 2))
 	taLocIndex = np.random.choice(range(N), numTA)
