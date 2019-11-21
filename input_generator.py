@@ -4,6 +4,8 @@ import string
 import tempfile
 import os
 import uuid
+import datetime
+from input_validator import validate_input, quick_validate
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -32,7 +34,7 @@ def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
 
 def create_temp_file(N, folder="inputs", prefix="", file_extension=".in"):
     curr_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
-    temp_dir = dir_path + os.path.join(dir_path, folder, str(N))
+    temp_dir = os.path.join(dir_path, folder, str(N))
     temp = tempfile.NamedTemporaryFile(
         delete=False, mode='w+t', prefix=prefix + "-{}".format(curr_time), dir=temp_dir, suffix=file_extension)
     return temp
@@ -50,6 +52,7 @@ def create_test_input(N, uniform=True, delete_edge_prob=0): # TODO Possible muta
     matrix = [[0] * N] * N
     for i in range(int(N/2)):
         for j in range(int(N/2)):
+            print(i, j)
             if i == j:
                 continue
             if np.random.uniform(0, 1) < delete_edge_prob:
@@ -73,3 +76,5 @@ def create_test_input(N, uniform=True, delete_edge_prob=0): # TODO Possible muta
     return len(list_of_locations), len(list_of_homes), list_of_locations, list_of_homes, start_car_position, matrix
 
 # Possible implement genetic algorthim for improvement
+if __name__ == '__main__':
+    save_test_to_file(5, 5, 5, 5, 5, 5, 5)
