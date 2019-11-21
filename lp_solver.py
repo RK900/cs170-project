@@ -32,7 +32,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	shortest_path_all_pairs = nx.all_pairs_dijkstra_path_length(graph)  # Shortest path between all vertices
 	TA = list_houses  # Vertex of the location of the TA at that spot
 
-	m = Model(sense=MINIMIZE, solver_name=CBC)  # use GRB for Gurobi
+	m = Model(sense=MINIMIZE, solver_name=GUROBI)  # use GRB for Gurobi
 	# variable that represents if the car takes the route
 	x = [m.add_var(name='car_taken_{}'.format(u, v), var_type=BINARY) for (u, v) in graph.edges()]
 
