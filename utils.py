@@ -36,3 +36,22 @@ def write_data_to_file(file, data, separator, append=False):
 
 def input_to_output(input_file):
     return input_file.replace('input', 'output').replace('.in', '.out')
+
+
+class Stack:
+    "A container with a last-in-first-out (LIFO) queuing policy."
+
+    def _init_(self):
+        self.list = []
+
+    def push(self, item):
+        "Push 'item' onto the stack"
+        self.list.append(item)
+
+    def pop(self):
+        "Pop the most recently pushed item from the stack"
+        return self.list.pop()
+
+    def isEmpty(self):
+        "Returns true if the stack is empty"
+        return len(self.list) == 0
