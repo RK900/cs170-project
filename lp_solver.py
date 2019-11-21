@@ -1,5 +1,5 @@
 import networkx as nx
-from util import *
+from utils import *
 
 def build_nx_graph_given_file(input_file):
     # Used adjacency_matrix_to_graph instead of other version to provide names to locations and labels to them
@@ -71,8 +71,8 @@ def solve(graph, list_locations, list_houses, starting_car_location):
     if status == OptimizationStatus.OPTIMAL or status == OptimizationStatus.FEASIBLE:
         print('solution:')
         for v in m.vars:
-        if abs(v.x) > 1e-6:  # only printing non-zeros
-            print('{} : {}'.format(v.name, v.x))
+            if abs(v.x) > 1e-6:  # only printing non-zeros
+                print('{} : {}'.format(v.name, v.x))
     return m.objective_value, m.objective_bound, x, T
 
 def get_path_car_taken_from_vars(x, T, list_locations, list_houses):
