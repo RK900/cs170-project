@@ -8,6 +8,7 @@ import numpy as np
 
 from input_validator import quick_validate
 from lp_solver import build_graph_given, solve
+from student_utils import data_parser
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -93,8 +94,10 @@ def create_test_input(N, uniform=True,
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
-		5)
+	# num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
+	# 	5)
+	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
+		'inputs/5/data.in')
 	save_test_to_file(5, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
 					  adjacency_matrix, provided_input=True)
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
