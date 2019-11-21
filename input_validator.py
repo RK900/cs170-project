@@ -148,8 +148,8 @@ def quick_validate(num_of_locations, num_houses, list_locations, list_houses, st
         return False
 
     if not len(set(list_houses)) == len(list_houses):
-        message += 'The names of your houses are not distinct.\n'
-        error = True
+        print("Name of houses not unique", list_houses)
+        return False
 
     # check adjacency matrix
     if not len(adjacency_matrix) == len(adjacency_matrix[0]) == num_of_locations:
