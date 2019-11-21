@@ -17,8 +17,8 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 					  adjacency_matrix):
 	G = nx.DiGraph()
 	G.add_nodes_from(list_locations)
-	for i, loc in enumerate(num_of_locations):
-		for j, other_loc in enumerate(num_of_locations):
+	for i, loc in enumerate(list_locations):
+		for j, other_loc in enumerate(list_houses):
 			if i == j:
 				continue
 			if adjacency_matrix[i][j] == 'x':
@@ -30,15 +30,15 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 
 def solve(graph, list_locations, list_houses, starting_car_location):
 	shortest_path_all_pairs = nx.all_pairs_dijkstra_path_length(graph)  # Shortest path between all vertices
-	TA = list_houses  # Vertex of the location of the TA at that spot
-
 	m = Model(sense=MINIMIZE, solver_name=GUROBI)  # use GRB for Gurobi
 	# variable that represents if the car takes the route
-	x = [m.add_var(name='car_taken_{}'.format(u, v), var_type=BINARY) for (u, v) in graph.edges()]
+	x = {(u, v): m.add_var(name='car_taken_{}'.format(u, v), var_type=BINARY) for (u, v) in graph.edges()}
 
 	for loc in list_locations:
-		incident_outgoing_edges = graph.in_edges(loc) + graph.out_edges(loc)
-		m += xsum(x[u][v] for (u, v) in incident_outgoing_edges) % 2 == 0, 'verify_even_car_routes_{}'.format(loc)
+		incoming_edges = list(graph.in_edges(loc))
+		outgoing_edges = list(graph.out_edges(loc))
+		m += xsum(x[(u, v)] for (u, v) in incoming_edges) == xsum(
+			x[(u, v)] for (u, v) in outgoing_edges), 'verify_even_car_routes_{}'.format(loc)
 
 	T = {}
 	for house in list_houses:
@@ -48,12 +48,12 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 
 		m += xsum(T[house]) == 1  # Each ta must be dropped off
 
-	w = [m.add_var(name='flow_in_{}'.format(house), var_type=BINARY) if house != starting_car_location else 1
-		 for house in list_houses]
+	w = {house: m.add_var(name='flow_in_{}'.format(house), var_type=BINARY) if house != starting_car_location else 1
+		 for house in list_locations}
 
 	for loc in list_locations:
-		incoming_edges = graph.in_edges(loc)
-		m += any(x[u][v] * w[v] for (u, v) in incoming_edges) - w_i[i] == 0, 'verify_connected_loc_{}'.format(loc)
+		incoming_edges = list(graph.in_edges(loc))
+		m += any(x[(u, v)] * w[v] for (u, v) in incoming_edges) - w[loc] == 0, 'verify_connected_loc_{}'.format(loc)
 
 	car_travel = 2 / 3 * xsum(x[u][v] * d['weight'] * w[v] for (u, v, d) in graph.edges(data=True))
 
@@ -80,7 +80,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	return m.objective_value, m.objective_bound, x, T
 
 
-def get_path_car_taken_from_vars(x, T, list_locations, list_houses, starting_location):
+def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location):
 	stack = Stack()
 	visited_edges = set()
 	path_car_taken = [starting_location]

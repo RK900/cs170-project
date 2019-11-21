@@ -7,6 +7,7 @@ from string import ascii_lowercase
 import numpy as np
 
 from input_validator import quick_validate
+from lp_solver import build_graph_given, solve
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -15,11 +16,13 @@ def getUUIDLabel():
 	return ''.join(random.choices(ascii_lowercase, k=20))
 
 
-def save_test_to_file(N, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
-					  adjacency_matrix):
+def save_test_to_file(N, num_of_locations=None, num_houses=None, list_locations=None, list_houses=None,
+					  starting_car_location=None,
+					  adjacency_matrix=None, provided_input=False):
 	temp = create_temp_file(N)
-	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
-		N)
+	if not provided_input:
+		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
+			N)
 	temp.writelines(str(num_of_locations) + "\n")
 	temp.writelines(str(num_houses) + "\n")
 	temp.writelines(" ".join(list_locations) + "\n")
@@ -90,4 +93,11 @@ def create_test_input(N, uniform=True,
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-	save_test_to_file(5, 5, 5, 5, 5, 5, 5)
+	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
+		5)
+	save_test_to_file(5, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
+					  adjacency_matrix, provided_input=True)
+	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
+																			  list_locations, list_houses,
+																			  starting_car_location, adjacency_matrix)
+	solve(G, list_locations, list_houses, starting_car_location)
