@@ -8,8 +8,8 @@ def build_nx_graph_given_file(input_file):
 	# Used adjacency_matrix_to_graph instead of other version to provide names to locations and labels to them
 	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
 		input_file)
-	return build_graph_given(num_of_locations, num_houses, list_locations,
-							 list_houses, starting_car_location, adjacency_matrix)
+	return build_graph_given(num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
+							 adjacency_matrix)
 
 
 # For optimization of skipping to write to file
@@ -24,7 +24,7 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 			if adjacency_matrix[i][j] == 'x':
 				continue
 			G.add_edge(loc, other_loc, weight=adjacency_matrix[i][j])
-			G.add_edge(loc, other_loc, weight=adjacency_matrix[i][j])
+			G.add_edge(other_loc, loc, weight=adjacency_matrix[i][j])
 	return G, list_locations, list_houses, starting_car_location
 
 
@@ -43,21 +43,26 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	T = {}
 	for house in list_houses:
 		for loc in list_locations:
-			T[(house,loc)] = m.add_var(
+			T[(house, loc)] = m.add_var(
 				name='ta_dropped_off_{}_{}'.format(house, loc), var_type=BINARY)
 
-		m += xsum(T[house,loc] for loc in list_locations) == 1  # Each ta must be dropped off
+		m += xsum(T[house, loc] for loc in list_locations) == 1  # Each ta must be dropped off
+
+	# for (i, j) in set(product(set(V) - {0}, set(V) - {0})):
+	# 	model += y[i] - (n + 1) * x[i][j] >= y[j] - n
 
 	w = {house: m.add_var(name='flow_in_{}'.format(house), var_type=BINARY) if house != starting_car_location else 1
 		 for house in list_locations}
 
 	for loc in list_locations:
 		incoming_edges = list(graph.in_edges(loc))
-		m += int(any(x[(u, v)] * w[v] for (u, v) in incoming_edges)) - w[loc] == 0, 'verify_connected_loc_{}'.format(loc)
+		m += xsum(w[v] for (u, v) in incoming_edges) - xsum(x[(u, v)] for (u, v) in incoming_edges) - w[
+			loc] >= 1, 'verify_connected_loc_{}'.format(
+			loc)
 
-	car_travel = 2 / 3 * xsum(x[u][v] * d['weight'] * w[v] for (u, v, d) in graph.edges(data=True))
+	car_travel = 2 / 3 * xsum(x[(u, v)] * d['weight'] * w[v] for (u, v, d) in graph.edges(data=True))
 
-	ta_travel = 1 * xsum(xsum(T[(ta,loc)] * shortest_path_all_pairs[loc][ta] * w[loc]
+	ta_travel = 1 * xsum(xsum(T[(ta, loc)] * shortest_path_all_pairs[loc][ta] * w[loc]
 							  for loc in list_locations) for ta in list_houses)
 
 	m.objective = car_travel + ta_travel
