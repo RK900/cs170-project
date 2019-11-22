@@ -39,7 +39,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 		shortest_path_all_pairs_dic[item[0]] = item[1]
 	m = Model(sense=MINIMIZE, solver_name=GUROBI)  # use GRB for GUROBI, use CBC for other
 	# variable that represents if the car takes the route
-	x = {(u, v): m.add_var(name='car_taken_{}'.format(u, v), var_type=BINARY) for (u, v) in graph.edges()}
+	x = {(u, v): m.add_var(name='car_taken_{}_{}'.format(u, v), var_type=BINARY) for (u, v) in graph.edges()}
 
 	for loc in list_locations:
 		incoming_edges = list(graph.in_edges(loc))
