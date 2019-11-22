@@ -8,7 +8,7 @@ import numpy as np
 
 import utils
 from input_validator import quick_validate
-from branch_cased_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
+from branch_cut_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
 from student_utils import data_parser
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

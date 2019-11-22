@@ -22,12 +22,6 @@ class SubTourCutGenerator(ConstrsGenerator):
 		for i in range(len(U)):
 			if r[i][1] >= 1:
 				G.add_edge(U[i], V[i], capacity=r[i][1])
-		pos = nx.spring_layout(G)
-		labels = nx.get_edge_attributes(G, 'weight')
-		# nx.draw_networkx(G)
-		nx.draw(G, pos)
-		nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-		# plt.show()
 		for loc in self.list_locations:
 			if loc == self.starting_loc:
 				continue
@@ -43,6 +37,7 @@ class SubTourCutGenerator(ConstrsGenerator):
 					if len(cp.cuts) > 256:
 						for cut in cp.cuts:
 							model += cut
+						return
 
 		for cut in cp.cuts:
 			model += cut
@@ -70,14 +65,6 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 				continue
 			G.add_edge(loc, other_loc, weight=adjacency_matrix[i][j])
 			G.add_edge(other_loc, loc, weight=adjacency_matrix[i][j])
-	pos = nx.spring_layout(G)
-	labels = nx.get_edge_attributes(G, 'weight')
-	# nx.draw_networkx(G)
-	nx.draw(G, pos)
-	nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-	# nx.draw_networkx_edge_labels(G,pos,edge_labels=labels)
-	# plt.show()
-	# print(G.edges())
 	return G, list_locations, list_houses, starting_car_location
 
 
