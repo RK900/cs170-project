@@ -3,6 +3,38 @@ from mip.constants import BINARY
 from itertools import product
 from networkx import minimum_cut, DiGraph
 from mip.model import *
+import networkx as nx
+from mip.callbacks import ConstrsGenerator, CutPool
+
+class SubTourCutGenerator(ConstrsGenerator):
+	def __init__(self, Fl: List[Tuple[int, int]]):
+		self.F = Fl
+
+	def generate_constrs(self, model: Model):
+		G = nx.DiGraph()
+		r = [(v, v.x) for v in model.vars if v.name.startswith('x(')]
+		print(r)
+		U = [int(v.name.split('(')[1].split(',')[0]) for v, f in r]
+		V = [int(v.name.split(')')[0].split(',')[1]) for v, f in r]
+		cp = CutPool()
+		for i in range(len(U)):
+			G.add_edge(U[i], V[i], capacity=r[i][1])
+		for (u, v) in F:
+			if u not in U or v not in V:
+				continue
+			val, (S, NS) = nx.minimum_cut(G, u, v)
+			if val <= 0.99:
+				arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
+				if sum(f for v, f in arcsInS) >= (len(S)-1)+1e-4:
+					cut = xsum(1.0*v for v, fm in arcsInS) <= len(S)-1
+					cp.add(cut)
+					if len(cp.cuts) > 256:
+						for cut in cp.cuts:
+							model += cut
+						return
+		for cut in cp.cuts:
+			model += cut
+		return
 
 N = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
 A = {('a', 'd'): 56, ('d', 'a'): 67, ('a', 'b'): 49, ('b', 'a'): 50,
@@ -25,20 +57,24 @@ for n in N:
 	m += xsum(x[a] for a in Aout[n]) == 1, 'out({})'.format(n)
 	m += xsum(x[a] for a in Ain[n]) == 1, 'in({})'.format(n)
 
-	newConstraints = True
-	m.relax()
+a = len(A)
+n = len(N)
+F = []
+for i in N:
+	(md, dp) = (0, -1)
+	for j in N:
+		if i != j and (i, j) in A.keys() and A[(i, j)] > md:
+			(md, dp) = (A[(i, j)], j)
+	F.append((i, dp))
 
-	while newConstraints:
-		m.optimize()
-		print('objective value : {}'.format(m.objective_value))
+# m.cuts_generator = SubTourCutGenerator(F)
+# m.optimize()
 
-		G = DiGraph()
-		for a in A:
-			G.add_edge(a[0], a[1], capacity=x[a].x)
+m.constrs_generator = SubTourCutGenerator(F)
+m.constrs_generator.lazy_constraints = True
+m.optimize()
+m.optimize()
 
-		newConstraints = False
-		for (n1, n2) in [(i, j) for (i, j) in product(N, N) if i != j]:
-			cut_value, (S, NS) = minimum_cut(G, n1, n2)
-			if (cut_value <= 0.99):
-				m += xsum(x[a] for a in A if (a[0] in S and a[1] in S)) <= len(S)-1
-				newConstraints = True
+arcs = [(i, j) for i in N for j in N if x[i][j].x >= 0.99]
+print('optimal route : {}'.format(arcs))
+
