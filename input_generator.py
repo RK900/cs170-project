@@ -90,24 +90,29 @@ def create_test_input(N, uniform=True,
 	return len(list_of_locations), len(list_of_homes), list_of_locations, list_of_homes, start_car_position, matrix
 
 
-# Possible implement genetic algorthim for improvement
-if __name__ == '__main__':
-	# num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
-	# 	50)
-	print("Completed input")
-	# print(len(list_houses))
-	input_data = utils.read_file('inputs/50/walk_home.in')
+def run(input_file="", random=False, size=50, draw=True):
+	if random:
+		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
+			size)
+		save_test_to_file(size, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
+						  adjacency_matrix, provided_input=True)
+	else:
+		input_data = utils.read_file(input_file)
 
-	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
-		input_data)
-
-	save_test_to_file(50, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
-	                  adjacency_matrix, provided_input=True)
+		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
+			input_data)
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
 																			  list_locations, list_houses,
 																			  starting_car_location, adjacency_matrix)
 	objective_value, objective_bound, x, T = solve(G, list_locations, list_houses, starting_car_location)
-	path_taken, dropped_off = get_path_car_taken_from_vars(G, x, T, list_locations, list_houses, starting_car_location)
+	path_taken, dropped_off = get_path_car_taken_from_vars(G, x, T, list_locations, list_houses, starting_car_location,
+														   draw=draw)
 	print(path_taken)
 	print(dropped_off)
 	save_output_file(num_of_locations, path_taken, dropped_off)
+
+# Possible implement genetic algorthim for improvement
+if __name__ == '__main__':
+	print("Completed input")
+	run('inputs/50/2_subconnected_components.in')
+# print(len(list_houses))
