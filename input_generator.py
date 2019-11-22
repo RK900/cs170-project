@@ -80,9 +80,9 @@ def create_test_input(N, uniform=True,
 				matrix[i][j] = expRes
 				matrix[j][i] = expRes
 
-	list_of_locations = [getUUIDLabel() for i in range(N)]
+	list_of_locations = [str(i) for i in range(N)]
 	numTA = round(np.random.uniform(0, N / 2))
-	taLocIndex = np.random.choice(range(N), numTA)
+	taLocIndex = np.random.choice(range(N), numTA, replace=False)
 	list_of_homes = [list_of_locations[i] for i in taLocIndex]
 	start_car_position = list_of_locations[0]
 	return len(list_of_locations), len(list_of_homes), list_of_locations, list_of_homes, start_car_position, matrix

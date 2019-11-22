@@ -153,8 +153,10 @@ def quick_validate(num_of_locations, num_houses, list_locations, list_houses, st
 
     # check adjacency matrix
     if not len(adjacency_matrix) == len(adjacency_matrix[0]) == num_of_locations:
+        print("incorrect adjacency")
         return False
     if not all(entry == 'x' or (type(entry) is float and entry > 0 and entry <= 2e9 and decimal_digits_check(entry)) for row in adjacency_matrix for entry in row):
+        print("incorrect x positions")
         return False
 
     # if not square, terminate
@@ -177,6 +179,7 @@ def quick_validate(num_of_locations, num_houses, list_locations, list_houses, st
         return False
 
     if not is_metric(G):
+        print("not metric")
         return False
 
     return True
