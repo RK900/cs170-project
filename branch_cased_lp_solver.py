@@ -7,23 +7,31 @@ from utils import *
 
 
 class SubTourCutGenerator(ConstrsGenerator):
-	def __init__(self, graph):
+	def __init__(self, graph, list_locations, starting_loc):
 		self.graph = graph
+		self.list_locations = list_locations
+		self.starting_loc = starting_loc
 
 	def generate_constrs(self, model: Model):
 		G = nx.DiGraph()
 		r = [(v, v.x) for v in model.vars if v.name.startswith('car_taken')]
 		U = [v.name.split('(')[1].split(',')[0] for v, f in r]
-		V = [v.name.split(')')[0].split(',')[1]  for v, f in r]
+		V = [v.name.split(')')[0].split(',')[1] for v, f in r]
 
 		cp = CutPool()
 		for i in range(len(U)):
-			G.add_edge(U[i], V[i], capacity=r[i][1])
-
-		for (u, v) in self.graph.edges():
-			if u not in U or v not in V:
+			if r[i][1] >= 1:
+				G.add_edge(U[i], V[i], capacity=r[i][1])
+		pos = nx.spring_layout(G)
+		labels = nx.get_edge_attributes(G, 'weight')
+		# nx.draw_networkx(G)
+		nx.draw(G, pos)
+		nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+		# plt.show()
+		for loc in self.list_locations:
+			if loc == self.starting_loc:
 				continue
-			val, (S, NS) = nx.minimum_cut(G, u, v)
+			val, (S, NS) = nx.minimum_cut(G, loc, self.starting_loc)
 			if val <= 0.99:
 				arcsInS = [(v, f) for i, (v, f) in enumerate(r)
 						   if U[i] in S and V[i] in S]
@@ -35,7 +43,7 @@ class SubTourCutGenerator(ConstrsGenerator):
 					if len(cp.cuts) > 256:
 						for cut in cp.cuts:
 							model += cut
-						return
+
 		for cut in cp.cuts:
 			model += cut
 		return
@@ -108,9 +116,9 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 
 	ta_travel = 1 * xsum(xsum(T[(house, loc)] * shortest_path_all_pairs_dic[loc][house]
 							  for loc in list_locations) for house in list_houses)
-	m.constrs_generator = SubTourCutGenerator(graph)
+	m.constrs_generator = SubTourCutGenerator(graph, list_locations, starting_car_location)
 	m.constrs_generator.lazy_constraints = True
-	m.lazy_constrs_generator = SubTourCutGenerator(graph)
+	m.lazy_constrs_generator = SubTourCutGenerator(graph, list_locations, starting_car_location)
 
 	m.objective = car_travel + ta_travel
 
