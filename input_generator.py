@@ -6,8 +6,10 @@ from string import ascii_lowercase
 
 import numpy as np
 
+import utils
 from branch_cut_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
 from input_validator import quick_validate
+from student_utils import data_parser
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -90,14 +92,15 @@ def create_test_input(N, uniform=True,
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
-		50)
+	# num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
+	# 	50)
 	print("Completed input")
-	print(len(list_houses))
-	# input_data = utils.read_file('inputs/tests/multiple.in')
+	# print(len(list_houses))
+	input_data = utils.read_file('inputs/50/walk_home.in')
 
-	# num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
-	# 	input_data)
+	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
+		input_data)
+
 	save_test_to_file(50, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
 	                  adjacency_matrix, provided_input=True)
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,

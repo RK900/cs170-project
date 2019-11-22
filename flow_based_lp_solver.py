@@ -1,3 +1,4 @@
+from matplotlib import pyplot
 from mip.model import *
 
 from student_utils import *
@@ -82,7 +83,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 
 	m.objective = car_travel + ta_travel
 
-	m.max_gap = 0.02
+	m.max_gap = 0.01
 	status = m.optimize(max_seconds=300)
 	if status == OptimizationStatus.OPTIMAL:
 		print('optimal solution cost {} found'.format(m.objective_value))
@@ -105,9 +106,22 @@ def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_
 	stk.lst = []
 	visited_edges = set()
 	path_car_taken = [starting_location]
+	G = nx.DiGraph()
+	G.add_edges_from(list_locations)
 	for (u, v) in g.out_edges(starting_location):
 		if x[(u, v)].x >= 0.99:
 			stk.push((u, v))
+
+	for (u, v) in g.edges():
+		if x[(u,v)].x >= 0.99:
+			G.add_edge(u, v)
+			print("added edge")
+	# pos = nx.spring_layout(G)
+	nx.draw_networkx(G)
+	# nx.draw(G, pos)
+	# nx.draw_networkx_edge_labels(G, pos)
+	pyplot.show(block=False)
+
 	while not stk.isEmpty():
 		(u, v) = stk.pop()
 		if (u, v) in visited_edges:

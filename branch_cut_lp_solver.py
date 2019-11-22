@@ -1,3 +1,5 @@
+import networkx
+from matplotlib import pyplot
 from mip.callbacks import ConstrsGenerator, CutPool
 from mip.model import *
 from mip.model import Model, xsum, BINARY
@@ -14,7 +16,7 @@ class SubTourCutGenerator(ConstrsGenerator):
 
 	def generate_constrs(self, model: Model):
 		G = nx.DiGraph()
-		G.add_nodes_from(self.list_locations)
+		# G.add_nodes_from(self.list_locations)
 		r = [(v, v.x) for v in model.vars if v.name.startswith('car_taken')]
 		U = [v.name.split('(')[1].split(',')[0] for v, f in r]
 		V = [v.name.split(')')[0].split(',')[1] for v, f in r]
@@ -23,21 +25,47 @@ class SubTourCutGenerator(ConstrsGenerator):
 		for i in range(len(U)):
 			if r[i][1] >= 1:
 				G.add_edge(U[i], V[i], capacity=r[i][1])
-		for loc in self.list_locations:
-			if loc == self.starting_loc:
+		Components = list(networkx.strongly_connected_components(G))
+		if len(Components) == 1:
+			return
+		for S in Components:
+			if self.starting_loc in S:
 				continue
-			val, (S, NS) = nx.minimum_cut(G, loc, self.starting_loc)
-			if val <= 0.99:
-				arcsInS = [(v, f) for i, (v, f) in enumerate(r)
-						   if U[i] in S and V[i] in S]
-				if sum(f for v, f in arcsInS) >= (len(S) - 1) + 1e-4:
-					cut = xsum(1.0 * v for v, fm in arcsInS) <= len(S) - 1
+			arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
+			if sum(f for v, f in arcsInS) > (len(S) - 1):
+				cut = xsum(1.0 * v for v, fm in arcsInS) <= len(S) - 1
+				cp.add(cut)
 
-					cp.add(cut)
-					if len(cp.cuts) > 256:
-						for cut in cp.cuts:
-							model += cut
-						return
+			# arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
+			# print(arcsInS)
+			# cp.add(xsum(x[
+		# i, j] for i in S for j in S if j > i) <= len(S) - 1)
+		# for S in Components:
+		# 	# model.addCons(quicksum(x[i, j] for i in S for j in S if j > i) <= len(S) - 1)
+		# 	m +=
+		# for loc in self.list_locations:
+		# 	if loc == self.starting_loc:
+		# 		continue
+		# 	for other_loc in self.list_locations:
+		# 		if other_loc != loc:
+		# 			continue
+		# 		# cut_value, (S, NS) = nx.minimum_cut(G, loc, other_loc)
+		# 		# if (cut_value <= 0.99):
+		# 		# 	arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
+		# 		# 	cut = xsum(x[a] for a in A if (a[0] in S and a[1] in S)) <= len(S) - 1
+		# 		# 	cp.add(cut)
+		# 		val, (S, NS) = nx.minimum_cut(G, loc, other_loc)
+		#
+		# 		if val <= 0.99:
+		# 			arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
+		# 			# if sum(f for v, f in arcsInS) > (len(S) - 1):
+		# 			cut = xsum(1.0 * v for v, fm in arcsInS) <= len(S) - 1
+		#
+		# 			cp.add(cut)
+		# 				# if len(cp.cuts) > 256:
+		# 				# 	for cut in cp.cuts:
+		# 				# 		model += cut
+		# 				# 	return
 
 		for cut in cp.cuts:
 			model += cut
@@ -139,6 +167,18 @@ def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_
 	for (u, v) in g.out_edges(starting_location):
 		if x[(u, v)].x >= 0.99:
 			stk.push((u, v))
+	G = nx.DiGraph()
+	# G.add_nodes_from(list_locations)
+	for (u, v) in g.out_edges(starting_location):
+		if x[(u, v)].x >= 0.99:
+			stk.push((u, v))
+
+	for (u, v) in g.edges():
+		if x[(u,v)].x >= 0.99:
+			G.add_edge(u, v)
+
+	nx.draw_networkx(G)
+	pyplot.show()
 	while not stk.isEmpty():
 		(u, v) = stk.pop()
 		if (u, v) in visited_edges:
