@@ -106,4 +106,5 @@ if __name__ == '__main__':
     G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
                                                                               list_locations, list_houses,
                                                                               starting_car_location, adjacency_matrix)
-    solve(G, list_locations, list_houses, starting_car_location)
+    objective_value, objective_bound, x, T = solve(G, list_locations, list_houses, starting_car_location)
+    
