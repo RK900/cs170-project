@@ -29,7 +29,6 @@ class SubTourCutGenerator(ConstrsGenerator):
 			if val <= 0.99:
 				arcsInS = [(v, f) for i, (v, f) in enumerate(r)
 						   if U[i] in S and V[i] in S]
-				print(sum(f for v, f in arcsInS), [v for v in S])
 				if sum(f for v, f in arcsInS) >= (len(S) - 1) + 1e-4:
 					cut = xsum(1.0 * v for v, fm in arcsInS) <= len(S) - 1
 

@@ -110,7 +110,12 @@ def tests(input_data, output_data, params=[]):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Parsing arguments')
+    input_file, output_file = 'inputs/tests/multiple.in', 'outputs/6/multiple.out'
+    input_validator.RANGE_OF_INPUT_SIZES.append(6)
+    input_validator.VALID_FILENAMES.append(input_file)
+    validate_output(input_file, output_file, params=[])
+
+    # parser = argparse.ArgumentParser(description='Parsing arguments')
     # parser.add_argument('--all', action='store_true', help='If specified, the output validator is run on all files in the output directory. Else, it is run on just the given output file')
     # parser.add_argument('input', type=str, help='The path to the input file or directory')
     # parser.add_argument('output', type=str, help='The path to the output file or directory')
@@ -120,5 +125,4 @@ if __name__ == '__main__':
     #     input_directory, output_directory = args.input, args.output
     #     validate_all_outputs(input_directory, output_directory, params=args.params)
     # else:
-    input_file, output_file = 'inputs/tests/test.in', 'outputs/6/01:12PM\ on\ November\ 22,\ 2019kk5d3wsa.out'
-    validate_output(input_file, output_file, params=[])
+

@@ -6,10 +6,8 @@ from string import ascii_lowercase
 
 import numpy as np
 
-import utils
-from input_validator import quick_validate
 from branch_cut_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
-from student_utils import data_parser
+from input_validator import quick_validate
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -75,7 +73,6 @@ def create_test_input(N, uniform=True,
 			elif uniform:
 				x = np.random.uniform(0, 1)
 				uniformRes = round(x, 5)
-				print(uniformRes)
 				matrix[i][j] = uniformRes
 				matrix[j][i] = uniformRes
 			else:
@@ -83,8 +80,6 @@ def create_test_input(N, uniform=True,
 				matrix[i][j] = expRes
 				matrix[j][i] = expRes
 
-	for item in matrix:
-		print(item)
 	list_of_locations = [getUUIDLabel() for i in range(N)]
 	numTA = round(np.random.uniform(0, N / 2))
 	taLocIndex = np.random.choice(range(N), numTA)
@@ -95,12 +90,13 @@ def create_test_input(N, uniform=True,
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-	# num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
-	# 	5)
-	input_data = utils.read_file('inputs/tests/multiple.in')
+	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
+		50)
+	print("Completed input")
+	# input_data = utils.read_file('inputs/tests/multiple.in')
 
-	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
-		input_data)
+	# num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
+	# 	input_data)
 	# save_test_to_file(5, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
 	#                   adjacency_matrix, provided_input=True)
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
