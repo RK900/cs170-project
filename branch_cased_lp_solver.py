@@ -12,9 +12,10 @@ class SubTourCutGenerator(ConstrsGenerator):
 
 	def generate_constrs(self, model: Model):
 		G = nx.DiGraph()
-		r = [(v, v.x) for v in model.vars if v.name.startswith('car_taken_')]
-		U = [int(v.name.split('(')[1].split(',')[0]) for v, f in r]
-		V = [int(v.name.split(')')[0].split(',')[1]) for v, f in r]
+		r = [(v, v.x) for v in model.vars if v.name.startswith('car_taken')]
+		U = [v.name.split('(')[1].split(',')[0] for v, f in r]
+		V = [v.name.split(')')[0].split(',')[1]  for v, f in r]
+
 		cp = CutPool()
 		for i in range(len(U)):
 			G.add_edge(U[i], V[i], capacity=r[i][1])
@@ -26,8 +27,10 @@ class SubTourCutGenerator(ConstrsGenerator):
 			if val <= 0.99:
 				arcsInS = [(v, f) for i, (v, f) in enumerate(r)
 						   if U[i] in S and V[i] in S]
+				print(sum(f for v, f in arcsInS), [v for v in S])
 				if sum(f for v, f in arcsInS) >= (len(S) - 1) + 1e-4:
 					cut = xsum(1.0 * v for v, fm in arcsInS) <= len(S) - 1
+
 					cp.add(cut)
 					if len(cp.cuts) > 256:
 						for cut in cp.cuts:
@@ -72,7 +75,6 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 
 def solve(graph, list_locations, list_houses, starting_car_location):
 	shortest_path_all_pairs = nx.all_pairs_dijkstra_path_length(graph)  # Shortest path between all vertices
-	print(shortest_path_all_pairs)
 	shortest_path_all_pairs_dic = {}
 	for item in shortest_path_all_pairs:
 		shortest_path_all_pairs_dic[item[0]] = item[1]
@@ -106,15 +108,17 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 
 	ta_travel = 1 * xsum(xsum(T[(house, loc)] * shortest_path_all_pairs_dic[loc][house]
 							  for loc in list_locations) for house in list_houses)
-
-	m.objective = car_travel + ta_travel
 	m.constrs_generator = SubTourCutGenerator(graph)
 	m.constrs_generator.lazy_constraints = True
+	m.lazy_constrs_generator = SubTourCutGenerator(graph)
+
+	m.objective = car_travel + ta_travel
+
 	# from random import shuffle
 	# S = [i for i in range(n)]
 	# shuffle(S)
 	# model.start = [(x[S[k - 1]][S[k]], 1.0) for k in range(n)]
-	m.max_gap = 0.02
+	m.max_gap = 0.01
 	status = m.optimize(max_seconds=300)
 	if status == OptimizationStatus.OPTIMAL:
 		print('optimal solution cost {} found'.format(m.objective_value))
