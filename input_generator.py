@@ -97,7 +97,7 @@ def create_test_input(N, uniform=True,
 if __name__ == '__main__':
     # num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
     # 	5)
-    input_data = utils.read_file('inputs/tests/test.in')
+    input_data = utils.read_file('inputs/tests/multiple.in')
 
     num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
         input_data)

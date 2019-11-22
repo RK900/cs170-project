@@ -25,9 +25,14 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 				continue
 			G.add_edge(loc, other_loc, weight=adjacency_matrix[i][j])
 			G.add_edge(other_loc, loc, weight=adjacency_matrix[i][j])
+	pos = nx.spring_layout(G)
+	labels = nx.get_edge_attributes(G,'weight')
 	# nx.draw_networkx(G)
+	nx.draw(G,pos)
+	nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+	# nx.draw_networkx_edge_labels(G,pos,edge_labels=labels)
 	# plt.show() 
-	print(G.edges())
+	# print(G.edges())
 	return G, list_locations, list_houses, starting_car_location
 
 
@@ -47,15 +52,15 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 		m += xsum(x[(u, v)] for (u, v) in incoming_edges) == xsum(
 			x[(u, v)] for (u, v) in outgoing_edges), 'verify_even_car_routes_{}'.format(loc)
 	u = {location: m.add_var(name='dummy_{}'.format(location), var_type=INTEGER) for location in list_locations}
-
+	m += u[starting_car_location] == 1
 	n = len(list_locations)
 	for i in list_locations:
 		if i != starting_car_location:
-			m += u[i] >= 0
-			m += u[i] <= n - 1
+			m += u[i] >= 2
+			m += u[i] <= n
 		for j in list_locations:
 			if i != j and i != starting_car_location and j != starting_car_location and (i, j) in x:
-				m += u[i] - u[j] + n * x[(i, j)] <= n - 1
+				m += u[i] - u[j] + 1  <= (n - 1) * (1 - x[(i, j)])
 	
 	T = {}
 	for house in list_houses:
