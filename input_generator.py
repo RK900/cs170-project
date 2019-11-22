@@ -71,7 +71,7 @@ def create_test_input(N, uniform=True,
 				matrix[i][j] = 'x'
 				matrix[j][i] = 'x'
 			elif uniform:
-				x = np.random.uniform(0, 1)
+				x = np.random.uniform(50, 99)
 				uniformRes = round(x, 5)
 				matrix[i][j] = uniformRes
 				matrix[j][i] = uniformRes
@@ -81,7 +81,7 @@ def create_test_input(N, uniform=True,
 				matrix[j][i] = expRes
 
 	list_of_locations = [str(i) for i in range(N)]
-	numTA = round(np.random.uniform(0, N / 2))
+	numTA = round(N / 2)
 	taLocIndex = np.random.choice(range(N), numTA, replace=False)
 	list_of_homes = [list_of_locations[i] for i in taLocIndex]
 	start_car_position = list_of_locations[0]
@@ -93,12 +93,13 @@ if __name__ == '__main__':
 	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
 		50)
 	print("Completed input")
+	print(len(list_houses))
 	# input_data = utils.read_file('inputs/tests/multiple.in')
 
 	# num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
 	# 	input_data)
-	# save_test_to_file(5, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
-	#                   adjacency_matrix, provided_input=True)
+	save_test_to_file(50, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
+	                  adjacency_matrix, provided_input=True)
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
 																			  list_locations, list_houses,
 																			  starting_car_location, adjacency_matrix)

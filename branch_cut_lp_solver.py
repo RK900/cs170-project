@@ -14,6 +14,7 @@ class SubTourCutGenerator(ConstrsGenerator):
 
 	def generate_constrs(self, model: Model):
 		G = nx.DiGraph()
+		G.add_nodes_from(self.list_locations)
 		r = [(v, v.x) for v in model.vars if v.name.startswith('car_taken')]
 		U = [v.name.split('(')[1].split(',')[0] for v, f in r]
 		V = [v.name.split(')')[0].split(',')[1] for v, f in r]
