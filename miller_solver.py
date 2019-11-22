@@ -2,8 +2,8 @@ from mip.model import *
 
 from student_utils import *
 from utils import *
-
-
+import matplotlib.pyplot as plt
+import time
 def build_nx_graph_given_file(input_file):
 	# Used adjacency_matrix_to_graph instead of other version to provide names to locations and labels to them
 	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
@@ -18,18 +18,25 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 	G = nx.DiGraph()
 	G.add_nodes_from(list_locations)
 	for i, loc in enumerate(list_locations):
-		for j, other_loc in enumerate(list_houses):
-			if i == j:
+		for j, other_loc in enumerate(list_locations):
+			if loc == other_loc:
 				continue
 			if adjacency_matrix[i][j] == 'x':
 				continue
 			G.add_edge(loc, other_loc, weight=adjacency_matrix[i][j])
 			G.add_edge(other_loc, loc, weight=adjacency_matrix[i][j])
+	# nx.draw_networkx(G)
+	# plt.show() 
+	print(G.edges())
 	return G, list_locations, list_houses, starting_car_location
 
 
 def solve(graph, list_locations, list_houses, starting_car_location):
 	shortest_path_all_pairs = nx.all_pairs_dijkstra_path_length(graph)  # Shortest path between all vertices
+	print(shortest_path_all_pairs)
+	shortest_path_all_pairs_dic = {}
+	for item in shortest_path_all_pairs:
+		shortest_path_all_pairs_dic[item[0]] = item[1]
 	m = Model(sense=MINIMIZE, solver_name=GUROBI)  # use GRB for GUROBI, use CBC for other
 	# variable that represents if the car takes the route
 	x = {(u, v): m.add_var(name='car_taken_{}'.format(u, v), var_type=BINARY) for (u, v) in graph.edges()}
@@ -47,29 +54,23 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 			m += u[i] >= 0
 			m += u[i] <= n - 1
 		for j in list_locations:
-			if i != j and i != starting_car_location and j != starting_car_location:
-				m += u[i] - u[j] + n  * x[(i, j)] <= n - 1
+			if i != j and i != starting_car_location and j != starting_car_location and (i, j) in x:
+				m += u[i] - u[j] + n * x[(i, j)] <= n - 1
+	
 	T = {}
 	for house in list_houses:
 		for loc in list_locations:
-			T[house][loc] = m.add_var(
-				name='ta_dropped_off_{}'.format(house), var_type=BINARY)
-			
-		m += xsum(T[house]) == 1  # Each ta must be dropped off
-
-	# w = {house: m.add_var(name='flow_in_{}'.format(house), var_type=BINARY) if house != starting_car_location else 1
-	# 	 for house in list_locations}
+			T[(house, loc)] = m.add_var(
+				name='ta_dropped_off_{}_{}'.format(house, loc), var_type=BINARY)
+			incoming_edges = list(graph.in_edges(loc))
+			m += xsum(x[(u, v)] for (u, v) in incoming_edges) - T[(house, loc)] >= 0
 	
+		m += xsum(T[(house, loc)] for loc in list_locations) == 1  # Each ta must be dropped off
 
+	car_travel = 2 / 3 * xsum(x[(u, v)] * d['weight'] for (u, v, d) in graph.edges(data=True))
 
-	# for loc in list_locations:
-	# 	incoming_edges = list(graph.in_edges(loc))
-	# 	m += any(x[(u, v)] * w[v] for (u, v) in incoming_edges) - w[loc] == 0, 'verify_connected_loc_{}'.format(loc)
-
-	car_travel = 2 / 3 * xsum(x[u][v] * d['weight'] for (u, v, d) in graph.edges(data=True))
-
-	ta_travel = 1 * xsum(xsum(T[loc][ta] * shortest_path_all_pairs[loc][ta]
-							  for loc in list_locations) for ta in list_houses)
+	ta_travel = 1 * xsum(xsum(T[(house, loc)] * shortest_path_all_pairs_dic[loc][house]
+							  for loc in list_locations) for house in list_houses)
 
 	m.objective = car_travel + ta_travel
 

@@ -8,7 +8,7 @@ import numpy as np
 import utils
 
 from input_validator import quick_validate
-from lp_solver import build_graph_given, solve
+from miller_solver import build_graph_given, solve
 from student_utils import data_parser
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

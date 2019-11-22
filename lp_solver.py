@@ -18,7 +18,7 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 	G = nx.DiGraph()
 	G.add_nodes_from(list_locations)
 	for i, loc in enumerate(list_locations):
-		for j, other_loc in enumerate(list_houses):
+		for j, other_loc in enumerate(list_locations):
 			if i == j:
 				continue
 			if adjacency_matrix[i][j] == 'x':
