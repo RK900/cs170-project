@@ -7,7 +7,7 @@ from string import ascii_lowercase
 import numpy as np
 
 import utils
-from branch_cut_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
+from miller_solver import build_graph_given, solve, get_path_car_taken_from_vars
 from input_validator import quick_validate
 from student_utils import data_parser
 
@@ -31,6 +31,18 @@ def save_test_to_file(N, num_of_locations=None, num_houses=None, list_locations=
 	temp.writelines(" ".join(list_houses) + "\n")
 	temp.writelines(starting_car_location + "\n")
 	temp.writelines("\n".join([" ".join(map(str, row)) for row in adjacency_matrix]))
+
+def save_input_to_file(N, num_of_locations=None, num_houses=None, list_locations=None, list_houses=None,
+					  starting_car_location=None,
+					  adjacency_matrix=None, provided_input=False):
+
+	with open('inputs/%i.in' % N, 'w') as temp:
+		temp.writelines(str(num_of_locations) + "\n")
+		temp.writelines(str(num_houses) + "\n")
+		temp.writelines(" ".join(list_locations) + "\n")
+		temp.writelines(" ".join(list_houses) + "\n")
+		temp.writelines(starting_car_location + "\n")
+		temp.writelines("\n".join([" ".join(map(str, row)) for row in adjacency_matrix]))
 
 
 def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
@@ -114,5 +126,6 @@ def run(input_file="", random=False, size=50, draw=True):
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
 	print("Completed input")
-	run('inputs/50/2_subconnected_components.in')
+	# run(random=True, size=50, draw=False)
+	run('inputs/200.in')
 # print(len(list_houses))

@@ -100,7 +100,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	m.objective = car_travel + ta_travel
 
 	m.max_gap = 0.02
-	status = m.optimize(max_seconds=300)
+	status = m.optimize()
 	if status == OptimizationStatus.OPTIMAL:
 		print('optimal solution cost {} found'.format(m.objective_value))
 	elif status == OptimizationStatus.FEASIBLE:
@@ -117,7 +117,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	return m.objective_value, m.objective_bound, x, T
 
 
-def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location):
+def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location, draw=False):
 	stk = Stack()
 	stk.lst = []
 	visited_edges = set()
