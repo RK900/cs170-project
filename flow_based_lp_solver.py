@@ -101,27 +101,27 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	return m.objective_value, m.objective_bound, C, T
 
 
-def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location):
+
+def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location, draw=False):
 	stk = Stack()
 	stk.lst = []
 	visited_edges = set()
 	path_car_taken = [starting_location]
-	G = nx.DiGraph()
-	G.add_edges_from(list_locations)
 	for (u, v) in g.out_edges(starting_location):
 		if x[(u, v)].x >= 0.99:
 			stk.push((u, v))
+	# G.add_nodes_from(list_locations)
+	for (u, v) in g.out_edges(starting_location):
+		if x[(u, v)].x >= 0.99:
+			stk.push((u, v))
+	if draw:
+		G = nx.DiGraph()
+		for (u, v) in g.edges():
+			if x[(u, v)].x >= 0.99:
+				G.add_edge(u, v)
 
-	for (u, v) in g.edges():
-		if x[(u,v)].x >= 0.99:
-			G.add_edge(u, v)
-			print("added edge")
-	# pos = nx.spring_layout(G)
-	nx.draw_networkx(G)
-	# nx.draw(G, pos)
-	# nx.draw_networkx_edge_labels(G, pos)
-	pyplot.show(block=False)
-
+		nx.draw_networkx(G)
+		pyplot.show()
 	while not stk.isEmpty():
 		(u, v) = stk.pop()
 		if (u, v) in visited_edges:

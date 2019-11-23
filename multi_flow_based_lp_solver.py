@@ -9,8 +9,8 @@ def build_nx_graph_given_file(input_file):
 	# Used adjacency_matrix_to_graph instead of other version to provide names to locations and labels to them
 	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
 		input_file)
-	return build_graph_given(num_of_locations, num_houses, list_locations,
-							 list_houses, starting_car_location, adjacency_matrix)
+	return build_graph_given(num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
+							 adjacency_matrix)
 
 
 # For optimization of skipping to write to file
@@ -20,20 +20,12 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 	G.add_nodes_from(list_locations)
 	for i, loc in enumerate(list_locations):
 		for j, other_loc in enumerate(list_locations):
-			if loc == other_loc:
+			if i == j:
 				continue
 			if adjacency_matrix[i][j] == 'x':
 				continue
 			G.add_edge(loc, other_loc, weight=adjacency_matrix[i][j])
 			G.add_edge(other_loc, loc, weight=adjacency_matrix[i][j])
-	pos = nx.spring_layout(G)
-	labels = nx.get_edge_attributes(G, 'weight')
-	# nx.draw_networkx(G)
-	nx.draw(G, pos)
-	nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-	# nx.draw_networkx_edge_labels(G,pos,edge_labels=labels)
-	# plt.show() 
-	# print(G.edges())
 	return G, list_locations, list_houses, starting_car_location
 
 
@@ -42,37 +34,58 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	shortest_path_all_pairs_dic = {}
 	for item in shortest_path_all_pairs:
 		shortest_path_all_pairs_dic[item[0]] = item[1]
-	m = Model(sense=MINIMIZE, solver_name=GUROBI)  # use GUROBI, use CBC for other
-	# variable that represents if the car takes the route
-	x = {(u, v): m.add_var(name='car_taken_{}_{}'.format(u, v), var_type=BINARY) for (u, v) in graph.edges()}
 
+	m = Model(sense=MINIMIZE, solver_name=GUROBI)  # use GRB for Gurobi
+	# variable that represents if the car takes the route
+	X = {}
+	for (u, v) in graph.edges():
+		X[(u, v)] = m.add_var(name='car_taken_{}_{}'.format(u, v),
+							  var_type=BINARY)  # edges that are connected to source
+	total_flow = len(list_houses)
+
+	C = {}
+	for (u, v) in graph.edges():
+		C[(u, v)] = m.add_var(name='flow_on_edge_{}_{}'.format(u, v),
+							  var_type=INTEGER)  # edges that are connected to source
+		m += C[(u, v)] >= 0
+		m += C[(u, v)] <= total_flow  # each edge cannot pass more than houses - 1
+		m += C[(u, v)] >= X[(u, v)]  # the existance of an edge is upper bounded by the flow at an edge
+
+	F = {}
+	for loc in list_locations:
+		F[loc] = m.add_var(name='flow_on_vertex_{}'.format(loc), var_type=INTEGER)
+		# at each vertex flow can be atleast 0 or 1
+		m += F[loc] >= 0
+		m += F[loc] <= total_flow
+
+		if loc == starting_car_location:  # starting node has total flow
+			m += F[starting_car_location] == total_flow
+
+	# sum of flow on edges is at most 1
+	m += xsum(C[edge] for edge in graph.in_edges(starting_car_location)) <= total_flow
 	for loc in list_locations:
 		incoming_edges = list(graph.in_edges(loc))
 		outgoing_edges = list(graph.out_edges(loc))
-		m += xsum(x[(u, v)] for (u, v) in incoming_edges) == xsum(
-			x[(u, v)] for (u, v) in outgoing_edges), 'verify_even_car_routes_{}'.format(loc)
+		# Incoming edges = outgoing edges
+		m += xsum(X[(u, v)] for (u, v) in incoming_edges) == xsum(
+			X[(u, v)] for (u, v) in outgoing_edges), 'verify_even_car_routes_{}'.format(loc)
 
-	# edges = graph.edges()
-	# E = len(edges)
-	# U = {(u, v): m.add_var(name='edge_ordering_{}_{}'.format(u, v), var_type=INTEGER) for (u, v) in graph.edges()}
-	# # print(U)
-	# for (u, v) in edges:
-	# 	m += U[(u, v)] >= 0
-	# 	m += U[(u, v)] <= E - 1
-	# 	for (i, j) in edges:
-	# 		if i != u and i != starting_car_location and u != starting_car_location:
-	# 			m += U[(u, v)] - U[(i, j)] + E * (x[(i, j)]) <= E - 1
+		for (u, v) in incoming_edges:
+			# Flow at any destination is at least the ce edge to it
+			m += F[v] >= C[(u, v)]
+			m += C[(u, v)] <= F[u]  # The capacity edge has is upper bound by the flow from that vertex
 
-	u = {location: m.add_var(name='dummy_{}'.format(location), var_type=INTEGER) for location in list_locations}
-	m += u[starting_car_location] == 1
-	n = len(list_locations)
-	for i in list_locations:
-		if i != starting_car_location:
-			m += u[i] >= 2
-			m += u[i] <= n
-		for j in list_locations:
-			if i != j and i != starting_car_location and j != starting_car_location and (i, j) in x:
-				m += u[i] - u[j] + 1 <= (n - 1) * (1 - x[(i, j)])
+		# flow to any vertex is upper bounded by sum of flow to that vertex
+		m += F[loc] <= xsum(
+			C[(u, v)] for (u, v) in incoming_edges)  # The flow at a location is at most sum of the capacities to it
+		m += F[loc] <= total_flow * xsum(
+			X[(u, v)] for (u, v) in incoming_edges)  # flow at edge is 0 if now edges go there
+
+		if loc in list_houses:
+			m += xsum(C[(u, v)] for (u, v) in incoming_edges) - 1 == xsum(C[(u, v)] for (u, v) in outgoing_edges)
+		else:
+			# If not a house flow is conserved or a starting location
+			m += xsum(C[(u, v)] for (u, v) in incoming_edges) - xsum(C[(u, v)] for (u, v) in outgoing_edges) == 0
 
 	T = {}
 	for house in list_houses:
@@ -81,26 +94,21 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 				name='ta_dropped_off_at_{}_walked_to_{}'.format(loc, house), var_type=BINARY)
 			incoming_edges = list(graph.in_edges(loc))
 			# incoming_edges_house = list(graph.in_edges(house))
-			m += xsum(x[(u, v)] for (u, v) in incoming_edges) - T[(house, loc)] >= 0  # if sum is 0 then T has to be 0
+			m += xsum(X[(u, v)] for (u, v) in incoming_edges) - T[(house, loc)] >= 0  # if sum is 0 then T has to be 0
 			if house == loc:
-				m += xsum(x[(u, v)] for (u, v) in incoming_edges) <= T[
-					(house, loc)]  # if at house then it's 1 if bounded
-
-		# if loc == house:
-		# 	m +=
-		# m += xsum(x[(u, v)] for (u, v) in incoming_edges) - T[(house, loc)] >= 0
+				m += xsum(X[(u, v)] for (u, v) in incoming_edges) <= T[(house, loc)]  # if at house then it's 1 if bounded
 
 		m += xsum(T[(house, loc)] for loc in list_locations) == 1  # Each ta must be dropped off
 
-	car_travel = 2 / 3 * xsum(x[(u, v)] * d['weight'] for (u, v, d) in graph.edges(data=True))
+	car_travel = 2 / 3 * xsum(X[(u, v)] * d['weight'] for (u, v, d) in graph.edges(data=True))
 
-	ta_travel = 1 * xsum(xsum(T[(house, loc)] * shortest_path_all_pairs_dic[loc][house]
-							  for loc in list_locations) for house in list_houses)
+	ta_travel = 1 * xsum(
+		xsum(T[(ta, loc)] * shortest_path_all_pairs_dic[loc][ta] for loc in list_locations) for ta in list_houses)
 
 	m.objective = car_travel + ta_travel
 
-	m.max_gap = 0.02
-	status = m.optimize()
+	m.max_gap = 0.01
+	status = m.optimize(max_seconds=300)
 	if status == OptimizationStatus.OPTIMAL:
 		print('optimal solution cost {} found'.format(m.objective_value))
 	elif status == OptimizationStatus.FEASIBLE:
@@ -114,7 +122,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 		for v in m.vars:
 			if abs(v.x) > 1e-6:  # only printing non-zeros
 				print('{} : {}'.format(v.name, v.x))
-	return m.objective_value, m.objective_bound, x, T
+	return m.objective_value, m.objective_bound, C, T
 
 
 def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location, draw=False):
