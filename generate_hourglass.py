@@ -52,6 +52,7 @@ def add_walk_home(G, pivot, index):
 G, pivot, index = initialize_graph()
 pivot, index = add_hourglass(G, pivot, index)
 pivot, index = add_hourglass(G, pivot, index)
+pivot, index = add_walk_home(G, pivot, index)
 
 G.add_edge(0, 1, weight=1)
 G.add_edge(1, 0, weight=1)
