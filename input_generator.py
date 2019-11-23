@@ -7,8 +7,8 @@ from string import ascii_lowercase
 import numpy as np
 
 import utils
-from branch_cut_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
 from input_validator import quick_validate
+from multi_flow_based_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
 from student_utils import data_parser
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -60,7 +60,7 @@ def create_valid_test_input(N):
 
 
 def create_test_input(N, uniform=True,
-					  delete_edge_prob=0.05):  # TODO Possible mutate inputs so that good inputs are updated
+					  delete_edge_prob=0.2):  # TODO Possible mutate inputs so that good inputs are updated
 	matrix = [[0.0] * N for i in range(N)]
 	for i in range(N):
 		for j in range(N):
@@ -73,7 +73,7 @@ def create_test_input(N, uniform=True,
 				matrix[i][j] = 'x'
 				matrix[j][i] = 'x'
 			elif uniform:
-				x = np.random.uniform(50, 99)
+				x = np.random.uniform(0.5, 1)
 				uniformRes = round(x, 5)
 				matrix[i][j] = uniformRes
 				matrix[j][i] = uniformRes
@@ -90,7 +90,7 @@ def create_test_input(N, uniform=True,
 	return len(list_of_locations), len(list_of_homes), list_of_locations, list_of_homes, start_car_position, matrix
 
 
-def run(input_file="", random=False, size=50, draw=True):
+def run(input_file="", random=False, size=50, draw=False):
 	if random:
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
 			size)
@@ -111,8 +111,11 @@ def run(input_file="", random=False, size=50, draw=True):
 	print(dropped_off)
 	save_output_file(num_of_locations, path_taken, dropped_off)
 
+
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-	print("Completed input")
-	run('inputs/50/2_subconnected_components.in')
+	# print("Completed input")
+	run('inputs/tests/walk_home.in', draw=True)
+# run(random=True, size=50)
+# run('inputs/50/2_subconnected_components.in')
 # print(len(list_houses))

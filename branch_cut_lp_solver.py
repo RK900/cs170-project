@@ -1,4 +1,5 @@
-import networkx
+from itertools import product
+
 from matplotlib import pyplot
 from mip.callbacks import ConstrsGenerator, CutPool
 from mip.model import *
@@ -25,20 +26,34 @@ class SubTourCutGenerator(ConstrsGenerator):
 		for i in range(len(U)):
 			if r[i][1] >= 1:
 				G.add_edge(U[i], V[i], capacity=r[i][1])
-		Components = list(networkx.strongly_connected_components(G))
-		if len(Components) == 1:
-			return
+		# for (n1, n2) in [(i, j) for (i, j) in product(self.list_locations, self.list_locations) if i != j]:
+		# 	cut_value, (S, NS) = nx.minimum_cut(G, n1, n2)
+		# 	if (cut_value <= 0.99):
+		# 		arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
+		# 		if sum(f for v, f in arcsInS) > (len(S) - 1):
+		# 			cut = xsum(1.0 * v for v, fm in arcsInS) <= len(S) - 1
+		# 			cp.add(cut)
+		Components = list(nx.strongly_connected_components(G))
+		# print("walking home scc", Components, G.edges())
+		# if len(Components) == 1:
+		# 	return
+		#
 		for S in Components:
 			if self.starting_loc in S:
 				continue
-			arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
-			if sum(f for v, f in arcsInS) > (len(S) - 1):
+		# 	# else:
+			arcsInS = []
+			for i, (variable, value) in enumerate(r):
+				if U[i] in S and V[i] in S:  # both vertices are in S
+					arcsInS.append((variable, value))
+
+			if sum(f for v, f in arcsInS) >= (len(S) - 1):
 				cut = xsum(1.0 * v for v, fm in arcsInS) <= len(S) - 1
 				cp.add(cut)
 
-			# arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
-			# print(arcsInS)
-			# cp.add(xsum(x[
+		# arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
+		# print(arcsInS)
+		# cp.add(xsum(x[
 		# i, j] for i in S for j in S if j > i) <= len(S) - 1)
 		# for S in Components:
 		# 	# model.addCons(quicksum(x[i, j] for i in S for j in S if j > i) <= len(S) - 1)
@@ -55,12 +70,12 @@ class SubTourCutGenerator(ConstrsGenerator):
 		# 		# 	cut = xsum(x[a] for a in A if (a[0] in S and a[1] in S)) <= len(S) - 1
 		# 		# 	cp.add(cut)
 		# 		val, (S, NS) = nx.minimum_cut(G, loc, other_loc)
-		#
+
 		# 		if val <= 0.99:
 		# 			arcsInS = [(v, f) for i, (v, f) in enumerate(r) if U[i] in S and V[i] in S]
 		# 			# if sum(f for v, f in arcsInS) > (len(S) - 1):
 		# 			cut = xsum(1.0 * v for v, fm in arcsInS) <= len(S) - 1
-		#
+
 		# 			cp.add(cut)
 		# 				# if len(cp.cuts) > 256:
 		# 				# 	for cut in cp.cuts:
@@ -120,11 +135,15 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 			T[(house, loc)] = m.add_var(
 				name='ta_dropped_off_at_{}_walked_to_{}'.format(loc, house), var_type=BINARY)
 			incoming_edges = list(graph.in_edges(loc))
+
 			# incoming_edges_house = list(graph.in_edges(house))
-			m += xsum(x[(u, v)] for (u, v) in incoming_edges) - T[(house, loc)] >= 0  # if sum is 0 then T has to be 0
+
+			m += xsum(x[(u, v)] for (u, v) in incoming_edges) >= T[(house, loc)]  # if sum is 0 then T has to be 0
+
 			if house == loc:
 				m += xsum(x[(u, v)] for (u, v) in incoming_edges) <= T[
 					(house, loc)]  # if at house then it's 1 if bounded
+
 		m += xsum(T[(house, loc)] for loc in list_locations) == 1  # Each ta must be dropped off
 
 	car_travel = 2 / 3 * xsum(x[(u, v)] * d['weight'] for (u, v, d) in graph.edges(data=True))
@@ -142,7 +161,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	# shuffle(S)
 	# model.start = [(x[S[k - 1]][S[k]], 1.0) for k in range(n)]
 	m.max_gap = 0.01
-	status = m.optimize(max_seconds=300)
+	status = m.optimize()
 	if status == OptimizationStatus.OPTIMAL:
 		print('optimal solution cost {} found'.format(m.objective_value))
 	elif status == OptimizationStatus.FEASIBLE:
@@ -159,26 +178,28 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	return m.objective_value, m.objective_bound, x, T
 
 
-def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location, draw=True):
+def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location, draw=False):
 	stk = Stack()
 	stk.lst = []
 	visited_edges = set()
+
 	path_car_taken = [starting_location]
 	for (u, v) in g.out_edges(starting_location):
 		if x[(u, v)].x >= 0.99:
 			stk.push((u, v))
-	# G.add_nodes_from(list_locations)
+
 	for (u, v) in g.out_edges(starting_location):
 		if x[(u, v)].x >= 0.99:
 			stk.push((u, v))
 	if draw:
 		G = nx.DiGraph()
 		for (u, v) in g.edges():
-			if x[(u,v)].x >= 0.99:
+			if x[(u, v)].x >= 0.99:
 				G.add_edge(u, v)
 
 		nx.draw_networkx(G)
 		pyplot.show()
+
 	while not stk.isEmpty():
 		(u, v) = stk.pop()
 		if (u, v) in visited_edges:

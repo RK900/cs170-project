@@ -1,3 +1,4 @@
+from matplotlib import pyplot
 from mip.model import *
 
 from student_utils import *
@@ -38,7 +39,6 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 
 def solve(graph, list_locations, list_houses, starting_car_location):
 	shortest_path_all_pairs = nx.all_pairs_dijkstra_path_length(graph)  # Shortest path between all vertices
-	print(shortest_path_all_pairs)
 	shortest_path_all_pairs_dic = {}
 	for item in shortest_path_all_pairs:
 		shortest_path_all_pairs_dic[item[0]] = item[1]
@@ -52,27 +52,27 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 		m += xsum(x[(u, v)] for (u, v) in incoming_edges) == xsum(
 			x[(u, v)] for (u, v) in outgoing_edges), 'verify_even_car_routes_{}'.format(loc)
 
-	edges = graph.edges()
-	E = len(edges)
-	U = {(u, v): m.add_var(name='edge_ordering_{}_{}'.format(u, v), var_type=INTEGER) for (u, v) in graph.edges()}
-	# print(U)
-	for (u, v) in edges:
-		m += U[(u, v)] >= 0
-		m += U[(u, v)] <= E - 1
-		for (i, j) in edges:
-			if i != u and i != starting_car_location and u != starting_car_location:
-				m += U[(u, v)] - U[(i, j)] + E * (x[(i, j)]) <= E - 1
+	# edges = graph.edges()
+	# E = len(edges)
+	# U = {(u, v): m.add_var(name='edge_ordering_{}_{}'.format(u, v), var_type=INTEGER) for (u, v) in graph.edges()}
+	# # print(U)
+	# for (u, v) in edges:
+	# 	m += U[(u, v)] >= 0
+	# 	m += U[(u, v)] <= E - 1
+	# 	for (i, j) in edges:
+	# 		if i != u and i != starting_car_location and u != starting_car_location:
+	# 			m += U[(u, v)] - U[(i, j)] + E * (x[(i, j)]) <= E - 1
 
-	# u = {location: m.add_var(name='dummy_{}'.format(location), var_type=INTEGER) for location in list_locations}
-	# m += u[starting_car_location] == 1
-	# n = len(list_locations)
-	# for i in list_locations:
-	# 	if i != starting_car_location:
-	# 		m += u[i] >= 2
-	# 		m += u[i] <= n
-	# 	for j in list_locations:
-	# 		if i != j and i != starting_car_location and j != starting_car_location and (i, j) in x:
-	# 			m += u[i] - u[j] + 1 <= (n - 1) * (1 - x[(i, j)])
+	u = {location: m.add_var(name='dummy_{}'.format(location), var_type=INTEGER) for location in list_locations}
+	m += u[starting_car_location] == 1
+	n = len(list_locations)
+	for i in list_locations:
+		if i != starting_car_location:
+			m += u[i] >= 2
+			m += u[i] <= n
+		for j in list_locations:
+			if i != j and i != starting_car_location and j != starting_car_location and (i, j) in x:
+				m += u[i] - u[j] + 1 <= (n - 1) * (1 - x[(i, j)])
 
 	T = {}
 	for house in list_houses:
@@ -99,7 +99,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 
 	m.objective = car_travel + ta_travel
 
-	m.max_gap = 0.02
+	m.max_gap = 0.03
 	status = m.optimize(max_seconds=300)
 	if status == OptimizationStatus.OPTIMAL:
 		print('optimal solution cost {} found'.format(m.objective_value))
@@ -117,7 +117,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	return m.objective_value, m.objective_bound, x, T
 
 
-def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location):
+def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location, draw=False):
 	stk = Stack()
 	stk.lst = []
 	visited_edges = set()
@@ -125,6 +125,18 @@ def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_
 	for (u, v) in g.out_edges(starting_location):
 		if x[(u, v)].x >= 0.99:
 			stk.push((u, v))
+	# G.add_nodes_from(list_locations)
+	for (u, v) in g.out_edges(starting_location):
+		if x[(u, v)].x >= 0.99:
+			stk.push((u, v))
+	if draw:
+		G = nx.DiGraph()
+		for (u, v) in g.edges():
+			if x[(u, v)].x >= 0.99:
+				G.add_edge(u, v)
+
+		nx.draw_networkx(G)
+		pyplot.show()
 	while not stk.isEmpty():
 		(u, v) = stk.pop()
 		if (u, v) in visited_edges:
