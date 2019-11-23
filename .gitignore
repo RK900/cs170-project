@@ -3,3 +3,6 @@ venv/
 .DS_STORE
 .idea/
 .vscode/
+*on*.out
+*on*.in
+
