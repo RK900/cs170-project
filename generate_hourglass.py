@@ -7,6 +7,7 @@ N = 50
 index = 0
 
 name_nodes = list(range( N))
+houses = []
 def initialize_graph():
     G = nx.DiGraph()
     index = 0
@@ -21,6 +22,7 @@ def add_hourglass(G, pivot, index):
     for i in range(1, 5):
         G.add_edge(index, index + i, weight=100)
         G.add_edge(index + i, index, weight=100)
+        houses.append(index + i)
 
     G.add_edge(index + 1, index + 2, weight=1)
     G.add_edge(index + 2, index + 1, weight=1)
@@ -38,6 +40,7 @@ def add_walk_home(G, pivot, index):
     for i in range(1, 5):
         G.add_edge(index, index + i, weight=1)
         G.add_edge(index + i, index, weight=1)
+        houses.append(index + i)
 
     G.add_edge(index + 1, index + 2, weight=1.5)
     G.add_edge(index + 2, index + 1, weight=1.5)
@@ -50,6 +53,7 @@ def add_walk_home(G, pivot, index):
     return pivot, index
 
 G, pivot, index = initialize_graph()
+# for i in range(3):
 pivot, index = add_hourglass(G, pivot, index)
 pivot, index = add_hourglass(G, pivot, index)
 pivot, index = add_walk_home(G, pivot, index)
@@ -58,13 +62,19 @@ G.add_edge(0, 1, weight=1)
 G.add_edge(1, 0, weight=1)
 # G.add_edge(1, 6, weight=1)
 # G.add_edge(6, 11, weight=1)
+f = 1
+while f < index:
+    G.add_edge(f, f+5, weight=1)
+    G.add_edge(f+5, f, weight=1)
+    f += 5
+
 
 a = nx.adjacency_matrix(G)
 a.toarray()
 print((a.toarray()))
 print(type(a.toarray().tolist()))
+print(len(a.toarray().tolist()))
+print(houses)
 
-print(pivot, index)
-
-nx.draw_shell(G, with_labels=True)
-# plt.show()
+nx.draw(G, with_labels=True)
+plt.show()
