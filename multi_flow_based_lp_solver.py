@@ -49,43 +49,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 							  var_type=INTEGER)  # edges that are connected to source
 		m += C[(u, v)] >= 0
 		m += C[(u, v)] <= total_flow  # each edge cannot pass more than houses - 1
-		m += C[(u, v)] >= X[(u, v)]  # the existance of an edge is upper bounded by the flow at an edge
-
-	F = {}
-	for loc in list_locations:
-		F[loc] = m.add_var(name='flow_on_vertex_{}'.format(loc), var_type=INTEGER)
-		# at each vertex flow can be atleast 0 or 1
-		m += F[loc] >= 0
-		m += F[loc] <= total_flow
-
-		if loc == starting_car_location:  # starting node has total flow
-			m += F[starting_car_location] == total_flow
-
-	# sum of flow on edges is at most 1
-	m += xsum(C[edge] for edge in graph.in_edges(starting_car_location)) <= total_flow
-	for loc in list_locations:
-		incoming_edges = list(graph.in_edges(loc))
-		outgoing_edges = list(graph.out_edges(loc))
-		# Incoming edges = outgoing edges
-		m += xsum(X[(u, v)] for (u, v) in incoming_edges) == xsum(
-			X[(u, v)] for (u, v) in outgoing_edges), 'verify_even_car_routes_{}'.format(loc)
-
-		for (u, v) in incoming_edges:
-			# Flow at any destination is at least the ce edge to it
-			m += F[v] >= C[(u, v)]
-			m += C[(u, v)] <= F[u]  # The capacity edge has is upper bound by the flow from that vertex
-
-		# flow to any vertex is upper bounded by sum of flow to that vertex
-		m += F[loc] <= xsum(
-			C[(u, v)] for (u, v) in incoming_edges)  # The flow at a location is at most sum of the capacities to it
-		m += F[loc] <= total_flow * xsum(
-			X[(u, v)] for (u, v) in incoming_edges)  # flow at edge is 0 if now edges go there
-
-		if loc in list_houses:
-			m += xsum(C[(u, v)] for (u, v) in incoming_edges) - 1 == xsum(C[(u, v)] for (u, v) in outgoing_edges)
-		else:
-			# If not a house flow is conserved or a starting location
-			m += xsum(C[(u, v)] for (u, v) in incoming_edges) - xsum(C[(u, v)] for (u, v) in outgoing_edges) == 0
+		m += C[(u, v)] <= X[(u, v)],  # flow can only appear if there is an edge to it
 
 	T = {}
 	for house in list_houses:
@@ -95,10 +59,28 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 			incoming_edges = list(graph.in_edges(loc))
 			# incoming_edges_house = list(graph.in_edges(house))
 			m += xsum(X[(u, v)] for (u, v) in incoming_edges) - T[(house, loc)] >= 0  # if sum is 0 then T has to be 0
-			if house == loc:
-				m += xsum(X[(u, v)] for (u, v) in incoming_edges) <= T[(house, loc)]  # if at house then it's 1 if bounded
+		# if house == loc:
+		# 	m += xsum(X[(u, v)] for (u, v) in incoming_edges) <= T[
+		# 		(house, loc)]  # if at house then it's 1 if bounded
 
 		m += xsum(T[(house, loc)] for loc in list_locations) == 1  # Each ta must be dropped off
+
+	m += xsum(X[(u, v)] for (u, v) in graph.in_edges(starting_car_location)) >= 1
+	m += xsum(X[(u, v)] for (u, v) in graph.out_edges(starting_car_location)) >= 1
+
+	# sum of flow on edges is at most 1
+	m += xsum(C[edge] for edge in graph.in_edges(starting_car_location)) == total_flow
+	for loc in list_locations:
+		incoming_edges = list(graph.in_edges(loc))
+		outgoing_edges = list(graph.out_edges(loc))
+		# Incoming edges = outgoing edges
+		m += xsum(X[(u, v)] for (u, v) in incoming_edges) == xsum(
+			X[(u, v)] for (u, v) in outgoing_edges), 'verify_even_car_routes_{}'.format(loc)
+	# if loc != starting_car_location:
+	# 	for ta in list_houses:
+	# 		for edge in outgoing_edges:
+	# 			m += xsum(C[(u, v)] for (u, v) in incoming_edges) - T[(ta, loc)] >= edge
+	# 			m += xsum(C[(u, v)] for (u, v) in incoming_edges) - 1 <= edge
 
 	car_travel = 2 / 3 * xsum(X[(u, v)] * d['weight'] for (u, v, d) in graph.edges(data=True))
 
@@ -122,7 +104,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 		for v in m.vars:
 			if abs(v.x) > 1e-6:  # only printing non-zeros
 				print('{} : {}'.format(v.name, v.x))
-	return m.objective_value, m.objective_bound, C, T
+	return m.objective_value, m.objective_bound, X, T
 
 
 def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_location, draw=False):
