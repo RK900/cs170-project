@@ -17,20 +17,14 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	for (u, v) in graph.edges():
 		X[(u, v)] = m.add_var(name='car_taken_{}_{}'.format(u, v),
 							  var_type=BINARY)  # edges that are connected to source
-	m += xsum(X[(u, v)] for (u, v) in graph.in_edges(starting_car_location)) >= 1
-	m += xsum(X[(u, v)] for (u, v) in graph.out_edges(starting_car_location)) >= 1
-
 	total_flow = len(list_houses)
-
 	C = {}
 	for (u, v) in graph.edges():
 		C[(u, v)] = m.add_var(name='flow_on_edge_{}_{}'.format(u, v),
 							  var_type=INTEGER)  # edges that are connected to source
 		m += C[(u, v)] >= 0
 		m += C[(u, v)] <= total_flow  # each edge cannot pass more than houses - 1
-		# m += C[(u, v)] - X[(u,v)] >= 0  # flow can only appear if there is an edge to it
 		m += C[(u,v)] <= (total_flow) * X[(u, v)]
-		
 	T = {}
 	for ta in list_houses:
 		for loc in list_locations:
@@ -40,32 +34,21 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 			m += xsum(X[(u, v)] for (u, v) in incoming_edges) >= T[(ta, loc)]  # if sum is 0 then T has to be 0
 		m += xsum(T[(ta, loc)] for loc in list_locations) == 1  # Each ta must be dropped off
 
-	# for edge in graph.in_edges(starting_car_location):
-	# 	m += C[edge] == total_flow - 1
-	# for edge in graph.out_edges(starting_car_location):
-	# 	m += C[edge] == total_flow - 1
-	m += xsum(C[edge] for edge in graph.out_edges(starting_car_location)) == total_flow
-
-	# outgoing - incoming flow = 1 for source vertex
-	# m += xsum(C[edge] for edge in graph.in_edges(starting_car_location))  - xsum(C[edge] for edge in graph.out_edges(starting_car_location)) == 1
 
 	for loc in list_locations:
 		incoming_edges = list(graph.in_edges(loc))
 		outgoing_edges = list(graph.out_edges(loc))
-		# Incoming edges = outgoing edges
 		m += xsum(X[(u, v)] for (u, v) in incoming_edges) == xsum(
 			X[(u, v)] for (u, v) in outgoing_edges), 'verify_even_car_routes_{}'.format(loc)
 		
 		if loc == starting_car_location:
+			m += xsum(X[(u, v)] for (u, v) in incoming_edges) >= 1
+			m += xsum(X[(u, v)] for (u, v) in outgoing_edges) >= 1
+			m += xsum(C[edge] for edge in outgoing_edges) == total_flow
 			continue
 
-		# m += xsum(C[(u, v)] for (u, v) in incoming_edges) - xsum(C[(u, v)] for (u, v) in outgoing_edges) >= 0
 		m += xsum(C[(u, v)] for (u, v) in incoming_edges) - xsum(C[(u, v)] for (u, v) in outgoing_edges) == xsum(T[(ta, loc)] for ta in list_houses) 		
 		
-		# diff is at most 0 if it's not being dropped off
-		# for ta in list_houses:
-		# 	m += xsum(C[(u, v)] for (u, v) in outgoing_edges) - xsum(C[(u, v)] for (u, v) in incoming_edges) <= xsum(T[(ta, loc)] for loc in list_locations)
-
 	car_travel = 2 / 3 * xsum(X[(u, v)] * d['weight'] for (u, v, d) in graph.edges(data=True))
 
 	ta_travel = 1 * xsum(
@@ -74,7 +57,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	m.objective = car_travel + ta_travel
 
 	m.max_gap = 0.01
-	status = m.optimize(max_seconds=300)
+	status = m.optimize()
 	if status == OptimizationStatus.OPTIMAL:
 		print('optimal solution cost {} found'.format(m.objective_value))
 	elif status == OptimizationStatus.FEASIBLE:
