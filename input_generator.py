@@ -114,6 +114,7 @@ def run(input_file="", random=False, size=50, draw=True):
 
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
 			input_data)
+	print("completed input")
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
 																			  list_locations, list_houses,
 																			  starting_car_location, adjacency_matrix)
@@ -122,17 +123,17 @@ def run(input_file="", random=False, size=50, draw=True):
 														   draw=draw)
 	print(path_taken)
 	print(dropped_off)
-	save_output_file(num_of_locations, path_taken, dropped_off)
+	# save_output_file(num_of_locations, path_taken, dropped_off)
 
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-	print("Completed input")
-	# run(random=True, size=50, draw=False)
+	# print("Completed input")
+	run(random=True, size=200, draw=False)
 	# run('inputs/200.in')
 	# print("Completed input")
 	# run('inputs/tests/multiple.in', draw=True)
-	# run(random=True, size=50)
-	run('inputs/50/2_subconnected_components.in')
+	# run(random=True)
+	# run('final_inputs/inputs/200.in')
 	# print(len(list_houses))
 	# run('inputs/tests/test.in')
