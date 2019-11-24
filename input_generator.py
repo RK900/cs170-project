@@ -103,7 +103,7 @@ def create_test_input(N, uniform=True,
 	return len(list_of_locations), len(list_of_homes), list_of_locations, list_of_homes, start_car_position, matrix
 
 
-def run(input_file="", random=False, size=50, draw=True):
+def run(input_file="", random=False, size=50, draw=True, solver=CBC):
 	if random:
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
 			size)
@@ -118,7 +118,7 @@ def run(input_file="", random=False, size=50, draw=True):
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
 																			  list_locations, list_houses,
 																			  starting_car_location, adjacency_matrix)
-	objective_value, objective_bound, x, T = solve(G, list_locations, list_houses, starting_car_location)
+	objective_value, objective_bound, x, T = solve(G, list_locations, list_houses, starting_car_location, solver)
 	path_taken, dropped_off = get_path_car_taken_from_vars(G, x, T, list_locations, list_houses, starting_car_location,
 														   draw=draw)
 	print(path_taken)
@@ -129,10 +129,10 @@ def run(input_file="", random=False, size=50, draw=True):
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
 	# print("Completed input")
-	run(random=True, size=200, draw=False)
+	# run(random=True, size=200, draw=False)
 	# run('inputs/200.in')
 	# print("Completed input")
-	# run('inputs/tests/multiple.in', draw=True)
+	run('inputs/tests/multiple.in', draw=True)
 	# run(random=True)
 	# run('final_inputs/inputs/200.in')
 	# print(len(list_houses))

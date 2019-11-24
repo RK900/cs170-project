@@ -5,13 +5,13 @@ from student_utils import *
 from utils import *
 
 
-def solve(graph, list_locations, list_houses, starting_car_location):
+def solve(graph, list_locations, list_houses, starting_car_location, solver=CBC):
 	shortest_path_all_pairs = nx.all_pairs_dijkstra_path_length(graph)  # Shortest path between all vertices
 	shortest_path_all_pairs_dic = {}
 	for item in shortest_path_all_pairs:
 		shortest_path_all_pairs_dic[item[0]] = item[1]
 
-	m = Model(sense=MINIMIZE, solver_name=CBC)  # use GRB for Gurobi
+	m = Model(sense=MINIMIZE, solver_name=solver)  # use GRB for Gurobi
 	X = {}	# variable that represents if the car takes the route
 	for (u, v) in graph.edges():
 		X[(u, v)] = m.add_var(name='car_taken_{}_{}'.format(u, v),
