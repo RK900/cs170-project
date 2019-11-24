@@ -111,12 +111,12 @@ def build_graph_given(num_of_locations, num_houses, list_locations, list_houses,
 	return G, list_locations, list_houses, starting_car_location
 
 
-def solve(graph, list_locations, list_houses, starting_car_location, solver=CBC):
+def solve(graph, list_locations, list_houses, starting_car_location):
 	shortest_path_all_pairs = nx.all_pairs_dijkstra_path_length(graph)  # Shortest path between all vertices
 	shortest_path_all_pairs_dic = {}
 	for item in shortest_path_all_pairs:
 		shortest_path_all_pairs_dic[item[0]] = item[1]
-	m = Model(sense=MINIMIZE, solver_name=solver)  # use GUROBI, use CBC for other
+	m = Model(sense=MINIMIZE, solver_name=GUROBI)  # use GUROBI, use CBC for other
 	# variable that represents if the car takes the route
 	x = {(u, v): m.add_var(name='car_taken({},{})'.format(u, v), var_type=BINARY) for (u, v) in graph.edges()}
 
