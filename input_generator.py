@@ -37,13 +37,18 @@ def save_test_to_file(N, num_of_locations=None, num_houses=None, list_locations=
 def save_input_to_file(N, num_of_locations=None, num_houses=None, list_locations=None, list_houses=None,
 					   starting_car_location=None,
 					   adjacency_matrix=None, provided_input=False):
-	with open('inputs/%i.in' % N, 'w') as temp:
+	now = datetime.datetime.now()
+	filename = str(N) + now.strftime('_%B%d_%H%M')
+	path = 'inputs/%s/' % str(N) + filename
+	with open(path + '.in', 'w') as temp:
 		temp.writelines(str(num_of_locations) + "\n")
 		temp.writelines(str(num_houses) + "\n")
 		temp.writelines(" ".join(list_locations) + "\n")
 		temp.writelines(" ".join(list_houses) + "\n")
 		temp.writelines(starting_car_location + "\n")
 		temp.writelines("\n".join([" ".join(map(str, row)) for row in adjacency_matrix]))
+	
+	return path + '.in'
 
 
 def save_temp_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
@@ -120,8 +125,6 @@ def run(input_file="", random=False, size=50, draw=True):
 	if random:
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
 			size)
-		save_test_to_file(size, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
-						  adjacency_matrix, provided_input=True)
 	else:
 		input_data = utils.read_file(input_file)
 
@@ -136,6 +139,9 @@ def run(input_file="", random=False, size=50, draw=True):
 														   draw=draw)
 	print(path_taken)
 	print(dropped_off)
+	if random:
+		print('Input file written to: ' + save_input_to_file(size, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
+						  adjacency_matrix, provided_input=True))
 	write_path = save_output_file(num_of_locations, path_taken, dropped_off)
 	print('Output file written to: ' + write_path)
 
@@ -143,13 +149,13 @@ def run(input_file="", random=False, size=50, draw=True):
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
 	# print("Completed input")
-	# run(random=True, size=200, draw=False)
+	run(random=True, size=50, draw=False)
 	# run('inputs/200.in')
 	# print("Completed input")
 	# run('inputs/tests/9_50.in', draw=False)
 	# run('inputs/tests/multiple.in', draw=False)
 	# run('inputs/tests/modified_hourglass.in', draw=True)
-	run('final_inputs/inputs/200.in')
+	# run('final_inputs/inputs/200.in')
 	# run(random=True)
 	# run('final_inputs/inputs/200.in')
 	# print(len(list_houses))
