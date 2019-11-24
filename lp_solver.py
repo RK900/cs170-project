@@ -24,9 +24,6 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 
 		m += xsum(T[house, loc] for loc in list_locations) == 1  # Each ta must be dropped off
 
-	# for (i, j) in set(product(set(V) - {0}, set(V) - {0})):
-	# 	model += y[i] - (n + 1) * x[i][j] >= y[j] - n
-
 	w = {house: m.add_var(name='flow_in_{}'.format(house), var_type=BINARY) if house != starting_car_location else 1
 		 for house in list_locations}
 
