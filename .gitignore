@@ -5,4 +5,6 @@ venv/
 .vscode/
 *on*.out
 *on*.in
+*November*.out
+*December*.out
 

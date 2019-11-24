@@ -11,7 +11,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	for item in shortest_path_all_pairs:
 		shortest_path_all_pairs_dic[item[0]] = item[1]
 
-	m = Model(sense=MINIMIZE, solver_name=CBC)  # use GRB for Gurobi
+	m = Model(sense=MINIMIZE, solver_name=GUROBI)  # use GRB for Gurobi
 	# variable that represents if the car takes the route
 	X = {}
 	for (u, v) in graph.edges():

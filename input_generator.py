@@ -46,12 +46,25 @@ def save_input_to_file(N, num_of_locations=None, num_houses=None, list_locations
 		temp.writelines("\n".join([" ".join(map(str, row)) for row in adjacency_matrix]))
 
 
-def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
+def save_temp_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
 	temp = create_temp_file(N, folder="outputs", prefix=input_file_name, file_extension=".out")
 	temp.writelines(" ".join(path_car_taken) + "\n")
 	temp.writelines(str(len(list_drop_of_locs)) + "\n")
 	for drop_of_locs in list_drop_of_locs:
 		temp.writelines(" ".join(drop_of_locs) + "\n")
+
+
+def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
+	now = datetime.datetime.now()
+	filename = str(N) + now.strftime('_%B%d_%H%M')
+	path = 'outputs/%s/' % str(N) + filename
+	with open(path + '.out', 'w') as temp:
+		temp.writelines(" ".join(path_car_taken) + "\n")
+		temp.writelines(str(len(list_drop_of_locs)) + "\n")
+		for drop_of_locs in list_drop_of_locs:
+			temp.writelines(" ".join(drop_of_locs) + "\n")
+	
+	return path + '.out'
 
 
 def create_temp_file(N, folder="inputs", prefix="", file_extension=".in"):
@@ -123,7 +136,8 @@ def run(input_file="", random=False, size=50, draw=True):
 														   draw=draw)
 	print(path_taken)
 	print(dropped_off)
-	# save_output_file(num_of_locations, path_taken, dropped_off)
+	write_path = save_output_file(num_of_locations, path_taken, dropped_off)
+	print('Output file written to: ' + write_path)
 
 
 # Possible implement genetic algorthim for improvement
@@ -132,7 +146,9 @@ if __name__ == '__main__':
 	# run(random=True, size=200, draw=False)
 	# run('inputs/200.in')
 	# print("Completed input")
-	run('inputs/tests/multiple.in', draw=True)
+	# run('inputs/tests/multiple.in', draw=False)
+	# run('inputs/tests/modified_hourglass.in', draw=True)
+	run('junk_old_files/final_inputs_0/inputs/200.in')
 	# run(random=True)
 	# run('final_inputs/inputs/200.in')
 	# print(len(list_houses))
