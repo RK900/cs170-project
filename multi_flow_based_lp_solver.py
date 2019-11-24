@@ -11,15 +11,14 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 	for item in shortest_path_all_pairs:
 		shortest_path_all_pairs_dic[item[0]] = item[1]
 
-	m = Model(sense=MINIMIZE, solver_name=CBC)  # use GRB for Gurobi
+	m = Model(sense=MINIMIZE, solver_name=GUROBI)  # use GRB for Gurobi
 	# variable that represents if the car takes the route
+	total_flow = len(list_houses)
 	X = {}
+	C = {}
 	for (u, v) in graph.edges():
 		X[(u, v)] = m.add_var(name='car_taken_{}_{}'.format(u, v),
 							  var_type=BINARY)  # edges that are connected to source
-	total_flow = len(list_houses)
-	C = {}
-	for (u, v) in graph.edges():
 		C[(u, v)] = m.add_var(name='flow_on_edge_{}_{}'.format(u, v),
 							  var_type=INTEGER)  # edges that are connected to source
 		m += C[(u, v)] >= 0
@@ -34,7 +33,6 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 			m += xsum(X[(u, v)] for (u, v) in incoming_edges) >= T[(ta, loc)]  # if sum is 0 then T has to be 0
 		m += xsum(T[(ta, loc)] for loc in list_locations) == 1  # Each ta must be dropped off
 
-
 	for loc in list_locations:
 		incoming_edges = list(graph.in_edges(loc))
 		outgoing_edges = list(graph.out_edges(loc))
@@ -47,8 +45,8 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 			m += xsum(C[edge] for edge in outgoing_edges) == total_flow
 			continue
 
-		m += xsum(C[(u, v)] for (u, v) in incoming_edges) - xsum(C[(u, v)] for (u, v) in outgoing_edges) == xsum(T[(ta, loc)] for ta in list_houses) 		
-		
+		m += xsum(C[(u, v)] for (u, v) in incoming_edges) - xsum(C[(u, v)] for (u, v) in outgoing_edges) == xsum(T[(ta, loc)] for ta in list_houses)
+	
 	car_travel = 2 / 3 * xsum(X[(u, v)] * d['weight'] for (u, v, d) in graph.edges(data=True))
 
 	ta_travel = 1 * xsum(

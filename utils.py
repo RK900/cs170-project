@@ -98,10 +98,6 @@ def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_
 	for (u, v) in g.out_edges(starting_location):
 		if x[(u, v)].x >= 0.99:
 			stk.push((u, v))
-	# G.add_nodes_from(list_locations)
-	for (u, v) in g.out_edges(starting_location):
-		if x[(u, v)].x >= 0.99:
-			stk.push((u, v))
 	if draw:
 		G = nx.DiGraph()
 		for (u, v) in g.edges():
@@ -110,6 +106,7 @@ def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_
 
 		nx.draw_networkx(G)
 		pyplot.show()
+	
 	while not stk.isEmpty():
 		(u, v) = stk.pop()
 		if (u, v) in visited_edges:
