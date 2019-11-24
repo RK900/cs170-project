@@ -24,6 +24,7 @@ def solve(graph, list_locations, list_houses, starting_car_location):
 		m += C[(u, v)] >= 0
 		m += C[(u, v)] <= total_flow  # each edge cannot pass more than houses - 1
 		m += C[(u,v)] <= (total_flow) * X[(u, v)]
+
 	T = {}
 	for ta in list_houses:
 		for loc in list_locations:
