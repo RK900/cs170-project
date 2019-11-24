@@ -129,10 +129,10 @@ def run(input_file="", random=False, size=50, draw=True):
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
 	# print("Completed input")
-	run(random=True, size=200, draw=False)
+	# run(random=True, size=200, draw=False)
 	# run('inputs/200.in')
 	# print("Completed input")
-	# run('inputs/tests/multiple.in', draw=True)
+	run('inputs/tests/multiple.in', draw=True)
 	# run(random=True)
 	# run('final_inputs/inputs/200.in')
 	# print(len(list_houses))
