@@ -148,7 +148,7 @@ if __name__ == '__main__':
 	# print("Completed input")
 	# run('inputs/tests/multiple.in', draw=False)
 	# run('inputs/tests/modified_hourglass.in', draw=True)
-	run('junk_old_files/final_inputs_0/inputs/200.in')
+	run('final_inputs/inputs/200.in')
 	# run(random=True)
 	# run('final_inputs/inputs/200.in')
 	# print(len(list_houses))
