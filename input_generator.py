@@ -8,10 +8,10 @@ import numpy as np
 
 import utils
 from input_validator import quick_validate
-from multi_flow_based_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
+from multi_flow_based_lp_solver import solve
 # from multi_flow_based_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
 from student_utils import data_parser
-
+from utils import build_graph_given, get_path_car_taken_from_vars
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -131,8 +131,8 @@ if __name__ == '__main__':
 	# run(random=True, size=50, draw=False)
 	# run('inputs/200.in')
 	# print("Completed input")
-	run('inputs/tests/multiple.in', draw=True)
+	# run('inputs/tests/multiple.in', draw=True)
 	# run(random=True, size=50)
-	# run('inputs/50/2_subconnected_components.in')
+	run('inputs/50/2_subconnected_components.in')
 	# print(len(list_houses))
 	# run('inputs/tests/test.in')
