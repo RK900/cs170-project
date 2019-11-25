@@ -163,7 +163,7 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 			files.append("{}_{}".format(i, extension))
 	for input_file in files:
 		run('phase2_inputs/{}.in'.format(input_file),draw=False,output_path='phase2_outputs/{}.out'.format(input_file), 
-		output_log_path='phase2_outputs/{}-log.out'.format(input_file), solver_mode=solver_mode)
+		output_log_path='phase2_log/{}-log.out'.format(input_file), solver_mode=solver_mode)
 	# for file in glob.glob(os.path.join(dir_path, input_folder) + '/[{}-{}].*'.format(range[0],range[1])):
 		# print(file)
 
@@ -171,7 +171,7 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-	run_batch_inputs('phase2_inputs', file_range=[1, 5], extensions=['50','100','200'], solver_mode='CBC')
+	run_batch_inputs('phase2_inputs', file_range=[1, 10], extensions=['50','100','200'])
 	# print("Completed input")
 	# run(random=True, size=50, draw=False)
 	# run('inputs/200.in')
