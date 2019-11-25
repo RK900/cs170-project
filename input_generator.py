@@ -163,7 +163,7 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 			files.append("{}_{}".format(i, extension))
 	for input_file in files:
 		run('phase2_inputs/{}.in'.format(input_file),draw=False,output_path='phase2_outputs/{}.out'.format(input_file), 
-		output_log_path='phase2_outputs/{}-log.out', solver_mode=solver_mode)
+		output_log_path='phase2_outputs/{}-log.out'.format(input_file), solver_mode=solver_mode)
 	# for file in glob.glob(os.path.join(dir_path, input_folder) + '/[{}-{}].*'.format(range[0],range[1])):
 		# print(file)
 
