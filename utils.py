@@ -12,7 +12,7 @@ def get_files_with_extension(directory, extension):
 
 def read_file(file):
 	print("reading_file", file)
-	with open(file, 'r') as f:
+	with open(file, 'r', encoding="utf-8") as f:
 		data = f.readlines()
 	data = [line.replace("Â", " ").strip().split() for line in data]
 	return data
