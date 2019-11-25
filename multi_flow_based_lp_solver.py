@@ -5,7 +5,7 @@ from student_utils import *
 from utils import *
 
 
-def solve(graph, list_locations, list_houses, starting_car_location, solver_mode="CBC"):
+def solve(graph, list_locations, list_houses, starting_car_location, solver_mode="CBC", time_limit=None):
 	shortest_path_all_pairs = nx.all_pairs_dijkstra_path_length(graph)  # Shortest path between all vertices
 	shortest_path_all_pairs_dic = {}
 	for item in shortest_path_all_pairs:
@@ -56,7 +56,11 @@ def solve(graph, list_locations, list_houses, starting_car_location, solver_mode
 	m.objective = car_travel + ta_travel
 
 	m.max_gap = 0.01
-	status = m.optimize()
+	if time_limit:
+		status = m.optimize(max_seconds=time_limit)
+	else:
+		status = m.optimize()
+	
 	if status == OptimizationStatus.OPTIMAL:
 		print('optimal solution cost {} found'.format(m.objective_value))
 	elif status == OptimizationStatus.FEASIBLE:
