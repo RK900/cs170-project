@@ -148,8 +148,8 @@ def run(input_file="", random=False, size=50, draw=False, output_path="", output
 	# print('Output file written to: ' + write_path)
 	if output_log_path:
 		with open(output_log_path, 'w') as f:
-			f.write('objective value: ' + objective_value + '\n')
-			f.write('objective bound: ' + objective_bound + '\n')
+			f.write('objective value: ' + str(objective_value) + '\n')
+			f.write('objective bound: ' + str(objective_bound) + '\n')
 
 
 
