@@ -32,11 +32,12 @@ def validate_all_outputs(input_directory, output_directory, params=[]):
     all_results = []
     for input_file in input_files:
         output_file = utils.input_to_output(input_file)
-        print(input_file, output_file)
         if output_file not in output_files:
-            print(f'No corresponding .out file for {input_file}')
-            results = (None, None, f'No corresponding .out file for {input_file}')
+            continue
+            # print(f'No corresponding .out file for {input_file}')
+            # results = (None, None, f'No corresponding .out file for {input_file}')
         else:
+            print(input_file, output_file)
             results = validate_output(input_file, output_file, params=params)
 
         all_results.append((input_file, results))
@@ -110,10 +111,10 @@ def tests(input_data, output_data, params=[]):
 
 
 if __name__ == '__main__':
-    input_file, output_file = 'inputs/tests/multiple.in', 'outputs/6/multiple.out'
+    input_file, output_file = 'phase2_inputs', 'phase2_outputs'
     input_validator.RANGE_OF_INPUT_SIZES.append(6)
     input_validator.VALID_FILENAMES.append(input_file)
-    validate_output(input_file, output_file, params=[])
+    validate_all_outputs(input_file, output_file, params=[])
 
     # parser = argparse.ArgumentParser(description='Parsing arguments')
     # parser.add_argument('--all', action='store_true', help='If specified, the output validator is run on all files in the output directory. Else, it is run on just the given output file')
