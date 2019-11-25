@@ -131,21 +131,21 @@ def run(input_file="", random=False, size=50, draw=False, output_path="", output
 
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
 			input_data)
-	print("completed input")
+	# print("completed input")
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
 																			  list_locations, list_houses,
 																			  starting_car_location, adjacency_matrix)
 	objective_value, objective_bound, x, T = solve(G, list_locations, list_houses, starting_car_location, solver_mode=solver_mode)
 	path_taken, dropped_off = get_path_car_taken_from_vars(G, x, T, list_locations, list_houses, starting_car_location,
 														   draw=draw)
-	print(path_taken)
-	print(dropped_off)
+	# print(path_taken)
+	# print(dropped_off)
 
 	if random:
 		print('Input file written to: ' + save_input_to_file(size, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
 						  adjacency_matrix, provided_input=True))
 	write_path = save_output_file(num_of_locations, path_taken, dropped_off, output_path=output_path)
-	print('Output file written to: ' + write_path)
+	# print('Output file written to: ' + write_path)
 	if output_log_path:
 		with open(output_log_path, 'w') as f:
 			f.write('objective value: ' + objective_value + '\n')
@@ -171,15 +171,15 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
+	run_batch_inputs('phase2_inputs', file_range=[1, 5], extensions=['50','100','200'], solver_mode='CBC')
 	# print("Completed input")
-	run(random=True, size=50, draw=False)
+	# run(random=True, size=50, draw=False)
 	# run('inputs/200.in')
 	# print("Completed input")
 	# run('inputs/tests/9_50.in', draw=False)
 	# run('inputs/tests/multiple.in', draw=False)
 	# run('inputs/tests/modified_hourglass.in', draw=True)
 	# run('final_inputs/inputs/200.in')
-	run_batch_inputs('phase2_inputs', solver_mode='CBC')
 	# run(random=True)
 	# run('final_inputs/inputs/200.in')
 	# print(len(list_houses))
