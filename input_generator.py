@@ -5,7 +5,7 @@ import tempfile
 from string import ascii_lowercase
 
 import numpy as np
-
+import glob
 import utils
 from input_validator import quick_validate
 from multi_flow_based_lp_solver import solve
@@ -54,18 +54,19 @@ def save_temp_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=
 		temp.writelines(" ".join(drop_of_locs) + "\n")
 
 
-def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
+def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name="",output_path=""):
 	now = datetime.datetime.now()
 	filename = str(N) + now.strftime('_%B%d_%H%M')
-	path = 'outputs/%s/' % str(N) + filename
-	with open(path + '.out', 'w') as temp:
+	path = 'outputs/%s/' % str(N) + filename + '.out'
+	if output_path:
+		path = output_path
+	with open(path, 'w') as temp:
 		temp.writelines(" ".join(path_car_taken) + "\n")
 		temp.writelines(str(len(list_drop_of_locs)) + "\n")
 		for drop_of_locs in list_drop_of_locs:
 			temp.writelines(" ".join(drop_of_locs) + "\n")
 	
-	return path + '.out'
-
+	return path
 
 def create_temp_file(N, folder="inputs", prefix="", file_extension=".in"):
 	curr_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
@@ -116,7 +117,7 @@ def create_test_input(N, uniform=True,
 	return len(list_of_locations), len(list_of_homes), list_of_locations, list_of_homes, start_car_position, matrix
 
 
-def run(input_file="", random=False, size=50, draw=True):
+def run(input_file="", random=False, size=50, draw=False, output_path="", output_log_path="", solver_mode="GRB"):
 	if random:
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
 			size)
@@ -131,13 +132,34 @@ def run(input_file="", random=False, size=50, draw=True):
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
 																			  list_locations, list_houses,
 																			  starting_car_location, adjacency_matrix)
-	objective_value, objective_bound, x, T = solve(G, list_locations, list_houses, starting_car_location)
+	objective_value, objective_bound, x, T = solve(G, list_locations, list_houses, starting_car_location, solver_mode=solver_mode)
 	path_taken, dropped_off = get_path_car_taken_from_vars(G, x, T, list_locations, list_houses, starting_car_location,
 														   draw=draw)
 	print(path_taken)
 	print(dropped_off)
-	write_path = save_output_file(num_of_locations, path_taken, dropped_off)
+	write_path = save_output_file(num_of_locations, path_taken, dropped_off, output_path=output_path)
 	print('Output file written to: ' + write_path)
+	if output_log_path:
+		with open(output_log_path, 'w') as f:
+			f.write('objective value: ' + objective_value + '\n')
+			f.write('objective bound: ' + objective_bound + '\n')
+
+
+
+		# save_log_path(objective_value, output_path=output_log_path)
+
+
+def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','200'], solver_mode='GRB'):
+	files = []
+	for i in range(file_range[0], file_range[1] + 1):
+		for extension in extensions:
+			files.append("{}_{}".format(i, extension))
+	for input_file in files:
+		run('phase2_inputs/{}.in'.format(input_file),draw=False,output_path='phase2_outputs/{}.out'.format(input_file), 
+		output_log_path='phase2_outputs/{}-log.out', solver_mode=solver_mode)
+	# for file in glob.glob(os.path.join(dir_path, input_folder) + '/[{}-{}].*'.format(range[0],range[1])):
+		# print(file)
+
 
 
 # Possible implement genetic algorthim for improvement
@@ -149,7 +171,8 @@ if __name__ == '__main__':
 	# run('inputs/tests/9_50.in', draw=False)
 	# run('inputs/tests/multiple.in', draw=False)
 	# run('inputs/tests/modified_hourglass.in', draw=True)
-	run('final_inputs/inputs/200.in')
+	# run('final_inputs/inputs/200.in')
+	run_batch_inputs('phase2_inputs', solver_mode='CBC')
 	# run(random=True)
 	# run('final_inputs/inputs/200.in')
 	# print(len(list_houses))
