@@ -179,10 +179,7 @@ if __name__ == '__main__':
 	# run('inputs/tests/multiple.in', draw=False)
 	# run('inputs/tests/modified_hourglass.in', draw=True)
 	# run('final_inputs/inputs/200.in')
-<<<<<<< HEAD
 	run_batch_inputs('phase2_inputs', solver_mode='CBC')
-=======
->>>>>>> 036b49b419e98ee6214e4e9a6ba050c1be71d2ea
 	# run(random=True)
 	# run('final_inputs/inputs/200.in')
 	# print(len(list_houses))
