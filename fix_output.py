@@ -1,11 +1,15 @@
-
-def fix_output(input_file):
-    with open(input_file, 'r') as f:
+from output_validator import validate_output
+def fix_output(input_file_name):
+    with open("phase2_outputs/{}.out".format(input_file_name), 'r') as f:
         content = f.readlines()
     
     old_route = content[0][:]
     old_route = old_route.split()
 
+    if old_route[0] == old_route[-1]:
+        print(input_file_name, "already fixed")
+        return
+    
     new_route =  [old_route[0]]
     source = new_route[0]
     path_set = set()
@@ -38,10 +42,16 @@ def fix_output(input_file):
 
     print(' '.join(new_route))
     content[0] = ' '.join(new_route) + '\n'
-    with open(input_file, 'w') as f:
+    with open("phase2_outputs/{}.out".format(input_file_name), 'w') as f:
         f.writelines(content)
+
+    with open("phase2_log/{}-log.out".format(input_file_name), 'r') as f:
+        content = f.readlines()
+        print(content)
+
+    input_file, output_file = "phase2_inputs/{}.in".format(input_file_name), "phase2_outputs/{}.out".format(input_file_name)
+    validate_output(input_file, output_file, params=[])
 
 
 if __name__ == '__main__':
-    fix_output('phase2_outputs/180_100.out')
-
+    fix_output('146_50')
