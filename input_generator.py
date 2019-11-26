@@ -13,6 +13,8 @@ from multi_flow_based_lp_solver import solve
 # from multi_flow_based_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
 from student_utils import data_parser
 from utils import build_graph_given, get_path_car_taken_from_vars
+from fix_output import fix_output
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -199,7 +201,7 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-	run_batch_inputs('phase2_inputs', file_range=[24, 49], extensions=['100','200'])
+	run_batch_inputs('phase2_inputs', file_range=[53, 99], extensions=['100','200'])
 	# print("Completed input")
 	# run(random=True, size=50, draw=False)
 	# run('inputs/200.in')
