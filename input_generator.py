@@ -201,7 +201,7 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-	run_batch_inputs('phase2_inputs', file_range=[58, 99], extensions=['100','200'])
+	run_batch_inputs('phase2_inputs', file_range=[74, 74], extensions=['50'])
 	# print("Completed input")
 	# run(random=True, size=50, draw=False)
 	# run('inputs/200.in')
