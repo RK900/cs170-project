@@ -1,6 +1,9 @@
 from output_validator import validate_output
-def fix_output(input_file_name):
-    with open("phase2_outputs/{}.out".format(input_file_name), 'r') as f:
+def fix_output(input_file_name, validate=False,full_path=False):
+    path = "phase2_outputs/{}.out".format(input_file_name)
+    if full_path:
+        path = input_file_name
+    with open(path, 'r') as f:
         content = f.readlines()
     
     old_route = content[0][:]
@@ -44,13 +47,14 @@ def fix_output(input_file_name):
     content[0] = ' '.join(new_route) + '\n'
     with open("phase2_outputs/{}.out".format(input_file_name), 'w') as f:
         f.writelines(content)
+    
+    if validate:
+        with open("phase2_log/{}-log.out".format(input_file_name), 'r') as f:
+            content = f.readlines()
+            print(content)
 
-    with open("phase2_log/{}-log.out".format(input_file_name), 'r') as f:
-        content = f.readlines()
-        print(content)
-
-    input_file, output_file = "phase2_inputs/{}.in".format(input_file_name), "phase2_outputs/{}.out".format(input_file_name)
-    validate_output(input_file, output_file, params=[])
+        input_file, output_file = "phase2_inputs/{}.in".format(input_file_name), "phase2_outputs/{}.out".format(input_file_name)
+        validate_output(input_file, output_file, params=[])
 
 
 if __name__ == '__main__':
