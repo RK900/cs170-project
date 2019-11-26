@@ -58,4 +58,4 @@ def fix_output(input_file_name, validate=False,full_path=False):
 
 
 if __name__ == '__main__':
-    fix_output('146_50')
+    fix_output('113_100', validate=True)
