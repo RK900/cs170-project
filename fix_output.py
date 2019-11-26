@@ -45,7 +45,7 @@ def fix_output(input_file_name, validate=False,full_path=False):
 
     print(' '.join(new_route))
     content[0] = ' '.join(new_route) + '\n'
-    with open("phase2_outputs/{}.out".format(input_file_name), 'w') as f:
+    with open(path, 'w') as f:
         f.writelines(content)
     
     if validate:
