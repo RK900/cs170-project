@@ -111,7 +111,7 @@ def tests(input_data, output_data, params=[]):
 
 
 if __name__ == '__main__':
-    input_file, output_file = 'phase2_inputs/71_100.in', 'phase2_outputs/71_100.out'
+    input_file, output_file = 'phase2_inputs/71_200.in', 'phase2_outputs/71_200.out'
     input_validator.RANGE_OF_INPUT_SIZES.append(6)
     input_validator.VALID_FILENAMES.append(input_file)
     validate_output(input_file, output_file, params=[])
