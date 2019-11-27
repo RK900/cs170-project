@@ -155,7 +155,6 @@ def run(input_file="", random=False, size=50, draw=False, output_path="", output
 	else:
 		print(input_file)
 		input_data = utils.read_file(input_file)
-
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
 			input_data)
 	# print("completed input")
