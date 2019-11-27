@@ -24,4 +24,4 @@ def graph_output(input_file_name):
     pyplot.show()
 
 if __name__ == "__main__":
-    graph_output('71_100')
+    graph_output('71_200')
