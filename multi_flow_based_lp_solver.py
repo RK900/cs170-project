@@ -39,7 +39,6 @@ def solve(graph, list_locations, list_houses, starting_car_location, solver_mode
 		outgoing_edges = list(graph.out_edges(loc))
 		m += xsum(X[(u, v)] for (u, v) in incoming_edges) == xsum(
 			X[(u, v)] for (u, v) in outgoing_edges), 'verify_even_car_routes_{}'.format(loc)
-		m += X[(loc, loc)] == 0
 		if loc == starting_car_location:
 			m += xsum(X[(u, v)] for (u, v) in incoming_edges) >= 1
 			m += xsum(X[(u, v)] for (u, v) in outgoing_edges) >= 1
