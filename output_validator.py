@@ -18,7 +18,9 @@ def validate_output(input_file, output_file, params=[]):
     input_message, input_error = input_validator.tests(input_file)
     cost, message = tests(input_data, output_data, params=params)
     message = 'Comments about input file:\n\n' + input_message + 'Comments about output file:\n\n' + message
-
+    # if cost == 'infinite':
+    #     with open('failed.log', 'a+') as f:
+    #         f.write(input_file +  "  "+ message + "\n")
     print(message)
     if input_error:
         return input_error, 'infinite', input_message + 'Since this input is invalid, you will not receive a score for its output.\n'
@@ -111,10 +113,10 @@ def tests(input_data, output_data, params=[]):
 
 
 if __name__ == '__main__':
-    input_file, output_file = 'phase2_inputs/71_200.in', 'phase2_outputs/71_200.out'
+    input_file, output_file = 'phase2_inputs', 'phase2_outputs'
     input_validator.RANGE_OF_INPUT_SIZES.append(6)
     input_validator.VALID_FILENAMES.append(input_file)
-    validate_output(input_file, output_file, params=[])
+    validate_all_outputs(input_file, output_file, params=[])
 
     # parser = argparse.ArgumentParser(description='Parsing arguments')
     # parser.add_argument('--all', action='store_true', help='If specified, the output validator is run on all files in the output directory. Else, it is run on just the given output file')
