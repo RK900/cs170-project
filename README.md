@@ -19,10 +19,10 @@ To handle Ta walking home we define Ta[i][b] as an indicator variable  to be if 
 As we were building our lp, we realized that we could be creating invalid subtours. Then, we got inspired by the idea of flow to verify that each tour is connected to source. We define C as an integer that reprsents the amount of flow on a node. We say that flow in = flow out if its a node where a TA is dropped off. If a ta is dropped off, flow in - flow out = num ta dropped off. This is prevent local cycles that discount flow. We set the flow flowing out of source to be total flow, which is the number of Ta's to drop off. This idea was inspired by Single Commodity Flow.
 
 Our objective function to minimze energy: 
-![equation](https://latex.codecogs.com/gif.latex?%5Cmin%20%5Cfrac%7B2%7D%7B3%7D%20*%20%5Csum_%7B%28u%2Cv%29%20%5Cforall%20edges%7D%20x_%7Bij%7D%20*%20w_j%20*%20d_%7Bij%7D%20&plus;%201%20*%20%5Csum_%7Bi%20%5Cin%20TA%7D%20%5Csum_%7Bv%20%5Cin%20V%7D%20T%5Bi%5D%5Bv%5D%20*%20ShortestPath%28v%2C%20i%29%20*%20w%5Bv%5D)
+![equation](https://latex.codecogs.com/gif.latex?%5Cmin%20%5Cfrac%7B2%7D%7B3%7D%20*%20%5Csum_%7B%28u%2Cv%29%20%5Cin%20Edges%7D%20x_%7Bu%2Cv%7D%20*%20Distance%28u%2Cv%29%20&plus;%201%20*%20%5Csum_%7Bi%20%5Cin%20TA%7D%20%5Csum_%7Bv%20%5Cin%20V%7D%20T%5Bi%5D%5Bv%5D%20*%20ShortestPath%28v%2C%20i%29)
 <!-- Latex above is the rul encoded form of the below -->
 <!-- encode at https://www.codecogs.com/latex/eqneditor.php and render image at https://latex.codecogs.com/gif.latex? -->
-<!-- \min \frac{2}{3} * \sum_{(u,v) \forall edges} x_{ij} * w_j * d_{ij} + 1 * \sum_{i \in TA} \sum_{v \in V} T[i][v] * ShortestPath(v, i) * w[v] -->
+<!-- \min \frac{2}{3} * \sum_{(u,v) \forall edges} x_{ij} * d_{ij} + 1 * \sum_{i \in TA} \sum_{v \in V} T[i][v] * ShortestPath(v, i) -->
 
 
 # Running the Code
