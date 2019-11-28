@@ -179,7 +179,7 @@ def run(input_file="", random=False, size=50, draw=False, output_path="", output
 		print('Input file written to: ' + save_input_to_file(size, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
 						  adjacency_matrix, provided_input=True))
 	write_path = save_output_file(num_of_locations, path_taken, dropped_off, output_path=output_path)
-	fix_output(write_path, full_path=True)
+	#fix_output(write_path, full_path=True)
 	# print('Output file written to: ' + write_path)
 	if output_log_path:
 		make_dir_if_not_exists(output_log_path)
@@ -209,7 +209,7 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-    run_batch_inputs('phase2_inputs', file_range=[101, 101], extensions=['100'])
+    run_batch_inputs('phase2_inputs', file_range=[71, 71], extensions=['200'], solver_mode="CBC")
 	
 	# print("Completed input")
 	# run(random=True, size=50, draw=False)
