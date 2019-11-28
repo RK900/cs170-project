@@ -61,13 +61,21 @@ def save_temp_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=
 	for drop_of_locs in list_drop_of_locs:
 		temp.writelines(" ".join(drop_of_locs) + "\n")
 
-
+def make_dir_if_not_exists(path):
+	if not os.path.exists(os.path.dirname(path)):
+		try:
+			os.makedirs(os.path.dirname(path))
+		except OSError as exc: # Guard against race condition
+			if exc.errno != errno.EEXIST:
+				raise
+	
 def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name="",output_path=""):
 	now = datetime.datetime.now()
 	filename = str(N) + now.strftime('_%B%d_%H%M')
 	path = 'outputs/%s/' % str(N) + filename + '.out'
 	if output_path:
 		path = output_path
+	make_dir_if_not_exists(path)
 	with open(path, 'w') as temp:
 		temp.writelines((" ".join(path_car_taken) + "\n").encode('ascii', 'ignore').decode('ascii'))
 		temp.writelines(str(len(list_drop_of_locs)) + "\n")
@@ -174,6 +182,7 @@ def run(input_file="", random=False, size=50, draw=False, output_path="", output
 	fix_output(write_path, full_path=True)
 	# print('Output file written to: ' + write_path)
 	if output_log_path:
+		make_dir_if_not_exists(output_log_path)
 		with open(output_log_path, 'w') as f:
 			f.write('objective value: ' + str(objective_value) + '\n')
 			f.write('objective bound: ' + str(objective_bound) + '\n')
@@ -183,16 +192,16 @@ def run(input_file="", random=False, size=50, draw=False, output_path="", output
 		# save_log_path(objective_value, output_path=output_log_path)
 
 
-def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','200'], solver_mode='GRB', time_limit=10000):
+def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','200'], solver_mode='GRB', time_limit=10000, output_folder="phase2_outputs", log_folder="phase2_log"):
 	files = []
 	for i in range(file_range[0], file_range[1] + 1):
 		for extension in extensions:
 			files.append("{}_{}".format(i, extension))
 	for input_file in files:
 		print(input_file)
-		if os.path.isfile('phase2_inputs/{}.in'.format(input_file)):
-			run(input_file='phase2_inputs/{}.in'.format(input_file),draw=False,output_path='phase2_outputs/{}.out'.format(input_file), 
-			output_log_path='phase2_log/{}-log.out'.format(input_file), solver_mode=solver_mode,time_limit=time_limit)
+		if os.path.isfile('{}/{}.in'.format(input_folder, input_file)):
+			run(input_file='{}/{}.in'.format(input_folder, input_file),draw=False,output_path='{}/{}.out'.format(output_folder, input_file), 
+			output_log_path='{}/{}-log.out'.format(log_folder, input_file), solver_mode=solver_mode,time_limit=time_limit)
 	# for file in glob.glob(os.path.join(dir_path, input_folder) + '/[{}-{}].*'.format(range[0],range[1])):
 		# print(file)
 
@@ -204,6 +213,7 @@ if __name__ == '__main__':
     run_batch_inputs('phase2_inputs', file_range=[164, 164], extensions=['50'])
     run_batch_inputs('phase2_inputs', file_range=[172, 172], extensions=['50','200'])
     run_batch_inputs('phase2_inputs', file_range=[306, 306], extensions=['50','100','200'])
+	
 	# print("Completed input")
 	# run(random=True, size=50, draw=False)
 	# run('inputs/200.in')
