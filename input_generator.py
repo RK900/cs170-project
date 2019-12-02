@@ -209,8 +209,10 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-    run_batch_inputs('phase2_inputs', file_range=[71, 71], extensions=['200'], solver_mode="CBC")
-	
+    run_batch_inputs('phase2_inputs', file_range=[239, 239], extensions=['200'])
+    run_batch_inputs('phase2_inputs', file_range=[269, 269], extensions=['200'])
+    run_batch_inputs('phase2_inputs', file_range=[244, 244], extensions=['200'])
+    run_batch_inputs('phase2_inputs', file_range=[50, 50], extensions=['200'])
 	# print("Completed input")
 	# run(random=True, size=50, draw=False)
 	# run('inputs/200.in')
