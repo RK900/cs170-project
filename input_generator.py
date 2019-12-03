@@ -209,11 +209,9 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-    run_batch_inputs('phase2_inputs', file_range=[239, 239], extensions=['200'],time_limit=50000)
-    run_batch_inputs('phase2_inputs', file_range=[296, 296], extensions=['200'],time_limit=50000)
-    run_batch_inputs('phase2_inputs', file_range=[357, 357], extensions=['200'],time_limit=50000)
-    run_batch_inputs('phase2_inputs', file_range=[335, 335], extensions=['200'],time_limit=50000)
-    run_batch_inputs('phase2_inputs', file_range=[269, 269], extensions=['200'],time_limit=50000)
+    run_batch_inputs('phase2_inputs', file_range=[233, 233], extensions=['200'],time_limit=50000)
+    run_batch_inputs('phase2_inputs', file_range=[350, 350], extensions=['200'],time_limit=50000)
+    run_batch_inputs('phase2_inputs', file_range=[23, 23], extensions=['200'],time_limit=50000)
     run_batch_inputs('phase2_inputs', file_range=[214, 214], extensions=['200'],time_limit=50000)
         # print("Completed input")
 	# run(random=True, size=50, draw=False)
