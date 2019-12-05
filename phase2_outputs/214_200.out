@@ -1,5 +1,5 @@
-zero six thirteen twelve eleven ten seventeen sixteen twentythree thirty thirtyseven fortyfour fortyfive fiftytwo fiftynine fiftyeight fiftyseven sixtyfour seventy seventyseven seventyone seventyeight seventynine eightysix eightyseven ninetyfour onehunone onehuneight onehunnine onehunten onehuneleven onehuneighteen onehunseventeen onehunsixteen onehuntwentythree onehunthirty onehunthirtyseven onehunfortyfour onehunfortyfive onehunfortysix onehunfortyseven onehunfiftyfour onehunsixtyone onehunsixty onehunfiftynine onehunsixtysix onehunseventythree onehunseventyfour onehunseventyfive onehunsixtynine onehunseventysix onehuneightytwo onehuneightyone onehuneighty onehuneightyseven onehunninetyfour onehunninetythree onehunninetytwo onehunninetyone onehuneightyfour onehunseventyseven onehunseventyeight onehunseventyone onehunseventy onehunsixtythree onehunsixtyfour onehunfiftyseven onehunfifty onehunfortythree onehunthirtysix onehunthirtyfive onehunthirtyfour onehuntwentyseven onehuntwentyeight onehuntwentyone onehuntwenty onehuntwentysix onehunnineteen onehunthirteen onehunsix ninetynine ninetytwo ninetyeight ninetyone eightyfour eightythree eightytwo seventyfive seventyfour sixtyseven sixty fiftythree fiftyfour fiftyfive fiftysix fortynine fortythree thirtysix twentynine thirtyfive thirtyfour thirtythree twentysix twentyseven twenty thirteen fourteen seven one two three zero
-90
+zero six thirteen twelve eleven ten seventeen sixteen twentythree thirty thirtyseven fortyfour fortyfive fiftytwo fiftyone fiftyeight fiftyseven sixtyfour seventy seventyseven seventyone seventytwo seventynine eighty eightyseven ninetyfour onehunone onehuneight onehunnine onehunten onehuneleven onehuneighteen onehunseventeen onehunsixteen onehuntwentythree onehunthirty onehunthirtyseven onehunfortyfour onehunfortyfive onehunfortysix onehunfortyseven onehunfiftyfour onehunsixtyone onehunsixty onehunfiftynine onehunsixtysix onehunseventythree onehunseventyfour onehunseventyfive onehunsixtynine onehunseventysix onehuneightytwo onehuneightyone onehuneighty onehuneightyseven onehunninetyfour onehunninetythree onehunninetytwo onehunninetyone onehuneightyfour onehunseventyseven onehunseventyeight onehunseventyone onehunseventy onehunsixtythree onehunsixtyfour onehunfiftyseven onehunfifty onehunfortynine onehunfortytwo onehunthirtyfive onehunthirtyfour onehuntwentyseven onehuntwentyeight onehuntwentyone onehuntwenty onehuntwentysix onehunnineteen onehunthirteen onehunsix ninetynine ninetytwo eightyfive seventyeight eightyfour eightythree eightytwo seventyfive seventyfour sixtyseven sixty fiftythree fiftyfour fiftyfive fiftysix fortynine fortythree thirtysix twentynine thirtyfive thirtyfour thirtythree twentysix twentyseven twenty twentyone fourteen seven one two three zero
+92
 one one
 two two
 three three
@@ -9,9 +9,10 @@ ten ten
 eleven eleven
 twelve twelve
 fourteen fourteen
-sixteen fifteen sixteen
+sixteen sixteen
 seventeen seventeen
 twenty twenty
+twentyone fifteen
 twentythree twentythree
 twentysix twentyfive twentysix
 twentyseven twentyseven
@@ -32,7 +33,8 @@ sixty sixty
 sixtyfour sixtyfour
 sixtyseven sixtysix sixtyseven
 seventy sixtynine seventy
-seventyone seventyone seventytwo
+seventyone seventyone
+seventytwo seventytwo
 seventyfive seventyfive
 seventyseven seventyseven
 seventyeight seventyeight
@@ -41,7 +43,7 @@ eightytwo eightytwo
 eightythree eightythree
 eightyfour eightyfour
 eightyseven eightyseven
-ninetyeight ninetyeight
+ninetytwo ninetyeight
 ninetynine ninetynine
 onehunone onehunone
 onehuneight onehuneight
@@ -60,11 +62,11 @@ onehuntwentyeight onehuntwentyeight
 onehunthirty onehunthirty
 onehunthirtyfour onehunforty
 onehunthirtyfive onehunthirtyfive
-onehunfortythree onehunfortythree
-onehunfortyfour onehunfortyfour
+onehunfortyfour onehunfortythree onehunfortyfour
 onehunfortyfive onehunfortyfive
 onehunfortysix onehunfortysix
-onehunfifty onehunfortynine onehunfifty
+onehunfortynine onehunfortynine
+onehunfifty onehunfifty
 onehunfiftyfour onehunfiftyfour
 onehunfiftyseven onehunfiftyseven
 onehunfiftynine onehunfiftynine
