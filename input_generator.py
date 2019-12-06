@@ -209,7 +209,6 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 
 # Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-<<<<<<< HEAD
     run_batch_inputs('phase2_inputs', file_range=[258, 258], extensions=['200'],time_limit=50000)
     run_batch_inputs('phase2_inputs', file_range=[271, 271], extensions=['200'],time_limit=50000)
     
