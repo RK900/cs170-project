@@ -95,7 +95,7 @@ def cost_of_solution(G, car_cycle, dropoff_mapping):
             driving_cost = 0
         walking_cost = 0
         shortest = dict(nx.floyd_warshall(G))
-
+        
         for drop_location in dropoffs:
             for house in dropoff_mapping[drop_location]:
                 walking_cost += shortest[drop_location][house]

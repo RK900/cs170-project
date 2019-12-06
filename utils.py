@@ -1,6 +1,9 @@
 import os
 import networkx as nx
 from matplotlib import pyplot
+from output_validator import validate_output, input_validator
+import utils
+from student_utils import *
 
 def get_files_with_extension(directory, extension):
 	files = []
@@ -11,7 +14,7 @@ def get_files_with_extension(directory, extension):
 
 
 def read_file(file):
-	print("reading_file", file)
+	# print("reading_file", file)
 	with open(file, 'r', encoding="utf-8") as f:
 		data = f.readlines()
 	data = [line.replace("Â", " ").strip().split() for line in data]
@@ -132,3 +135,23 @@ def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_
 	for ta_left in list_drop_of_locs:
 		student_drop_off_locations.append([ta_left, ta_left])
 	return path_car_taken, student_drop_off_locations
+
+def calc_output_file_ratio(output_file):
+    input_file = output_file[:-len(".out")] + ".in"
+    input_validator.VALID_FILENAMES.append(input_file)
+    msg, calculated_score, err = validate_output("phase2_inputs/" + input_file, "phase2_outputs/" + output_file)
+    # print(msg, calculated_score, err)
+    input_data = utils.read_file("phase2_inputs/" + input_file)
+    num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
+        input_data)
+    G, message = adjacency_matrix_to_graph(adjacency_matrix)
+    car_cycle = convert_locations_to_indices([starting_car_location], list_locations)
+    dropoffs = {car_cycle[0]: convert_locations_to_indices(list_houses, list_locations)}
+    soda_cost, solution_message = cost_of_solution(G, car_cycle, dropoffs)
+
+    print(input_file, calculated_score, soda_cost)
+    ratio = calculated_score/soda_cost
+    if ratio > 1:
+        print("FAILURE")
+        print(input_file + " " + str(calculated_score) + " " + str(soda_cost))
+    return min(ratio, 1)
