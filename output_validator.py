@@ -21,7 +21,7 @@ def validate_output(input_file, output_file, params=[]):
     # if cost == 'infinite':
     #     with open('failed.log', 'a+') as f:
     #         f.write(input_file +  "  "+ message + "\n")
-    print(message)
+    # print(message)
     if input_error:
         return input_error, 'infinite', input_message + 'Since this input is invalid, you will not receive a score for its output.\n'
     return input_error, cost, message
