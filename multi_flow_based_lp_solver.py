@@ -54,7 +54,7 @@ def solve(graph, list_locations, list_houses, starting_car_location, solver_mode
 
 	m.objective = car_travel + ta_travel
 
-	m.max_gap = 0.01
+	m.max_gap = 0.00001
 	if time_limit:
 		status = m.optimize(max_seconds=time_limit)
 	else:
