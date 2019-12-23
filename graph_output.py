@@ -15,10 +15,6 @@ def graph_output(input_file_name):
             continue
         G.add_edge(old_route[i - 1], old_route[i])
         edges.append((old_route[i - 1], old_route[i]))
-    # print(edges)
-    # for (u, v) in G.edges():
-    #     if (u,v) in edges:
-            
 
     nx.draw_networkx(G)
     pyplot.show()

@@ -9,11 +9,11 @@ import numpy as np
 import glob
 import utils
 from input_validator import quick_validate
-from multi_flow_based_lp_solver import solve
+from lp_solver import solve
 # from multi_flow_based_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
 from student_utils import data_parser
 from utils import build_graph_given, get_path_car_taken_from_vars
-from fix_output import fix_output
+from fix_output import run_hierholzer
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -161,25 +161,21 @@ def run(input_file="", random=False, size=50, draw=False, output_path="", output
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
 			size)
 	else:
-		# print(input_file)
 		input_data = utils.read_file(input_file)
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
 			input_data)
-	# print("completed input")
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
 																			  list_locations, list_houses,
 																			  starting_car_location, adjacency_matrix)
 	objective_value, objective_bound, x, T = solve(G, list_locations, list_houses, starting_car_location, solver_mode=solver_mode,time_limit=time_limit)
 	path_taken, dropped_off = get_path_car_taken_from_vars(G, x, T, list_locations, list_houses, starting_car_location,
 														   draw=draw)
-	# print(path_taken)
-	# print(dropped_off)
 
 	if random:
 		print('Input file written to: ' + save_input_to_file(size, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
 						  adjacency_matrix, provided_input=True))
 	write_path = save_output_file(num_of_locations, path_taken, dropped_off, output_path=output_path)
-	#fix_output(write_path, full_path=True)
+	run_hierholzer(write_path, full_path=True)
 	# print('Output file written to: ' + write_path)
 	if output_log_path:
 		make_dir_if_not_exists(output_log_path)
@@ -211,16 +207,3 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 if __name__ == '__main__':
     run_batch_inputs('phase2_inputs', file_range=[258, 258], extensions=['200'],time_limit=50000)
     run_batch_inputs('phase2_inputs', file_range=[271, 271], extensions=['200'],time_limit=50000)
-    
-    # print("Completed input")
-	# run(random=True, size=50, draw=False)
-	# run('inputs/200.in')
-	# print("Completed input")
-	# run('inputs/tests/9_50.in', draw=False)
-	# run('inputs/tests/multiple.in', draw=False)
-	# run('inputs/tests/modified_hourglass.in', draw=True)
-	# run('final_inputs/inputs/200.in')
-	# run(random=True)
-	# run('final_inputs/inputs/200.in')
-	# print(len(list_houses))
-	# run('inputs/tests/test.in', draw=False)

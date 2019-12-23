@@ -17,11 +17,11 @@ We run a solver through the graph and time it. The graphs that take the longest 
 ## Linear Programming Approach
 We aim to solve the problem mainly through integer linear programming (ILP). We use the following given components of our LP: shortest path between all nodes and the distance between vertex i and j.
 
-We define the variable x[i][j] as an indicator variable to be 1 if the car takes the route and 0 if the car doesn't take the route. Since we want to make sure that the source vertex makes a round trip we ensure that for each vertex the sum of x[i][j] of incoming and outgoing edges is an even number.
+We define the variable x[i][j] as an indicator variable to be 1 if the car takes the route and 0 if the car doesn't take the route. Since we want to make sure that the source vertex makes a round trip we ensure that for each vertex the sum of x[i][j] of incoming is equal to the sum of outgoing edges.
 
-To handle a TA walking home we define Ta[i][b] as an indicator variable to be if ta i was dropped off at vertex b with 1 = dropped off at vertex b and 0 otherwise. Over all TAs, we set the sum of all potential dropoff locations to be 1, to ensure the TA is dropped off exactly once.
+To handle a TA walking home, we define TA[i][b] as an indicator variable to be 1 if TA i was dropped off at vertex b and 0 otherwise. For each of the TAs, we set the sum of all potential dropoff locations to be 1, to ensure the TA is dropped off exactly once. We also check that any drop off location is upper bounded by the number of cars that visit the vertex to make sure that TAs only get dropped off on the car’s path.
 
-As we were building our LP, we realized that we could be creating invalid subtours. Then, we got inspired by the idea of flow to verify that each tour is connected to source. We define C as an integer that reprsents the amount of flow on a node. We say that flow in = flow out on a node if a TA is not dropped off. If a TA is dropped off, flow in - flow out = number TAs dropped off. This is prevent local cycles that discount flow. We set the flow flowing out of source to be total flow, which is the number of Ta's to drop off. This idea was inspired by Single Commodity Flow.
+The next part handles eliminating subtours via a modified version of the single commodity flow (SCF) algorithm. We define Cij as an integer that represents the amount of flow on an edge. For every vertex, we say that the sum of the flow of the in edges - sum flow out = number TAs dropped off at vertex. This is prevent local cycles as flow is discounted whenever a TA is dropped off. We set the flow flowing out of source to be total flow, which is the number of Ta's to drop off.
 
 Our objective function to minimze energy: 
 ![equation](https://latex.codecogs.com/gif.latex?%5Cmin%20%5Cfrac%7B2%7D%7B3%7D%20*%20%5Csum_%7B%28u%2Cv%29%20%5Cin%20Edges%7D%20x_%7Bu%2Cv%7D%20*%20Distance%28u%2Cv%29%20&plus;%201%20*%20%5Csum_%7Bi%20%5Cin%20TA%7D%20%5Csum_%7Bv%20%5Cin%20V%7D%20T%5Bi%5D%5Bv%5D%20*%20ShortestPath%28v%2C%20i%29)
@@ -44,9 +44,10 @@ There are two solvers that you can use while running the project.
 You can either use the open source CBC LP optimizer or the gurobi optimizer.
 
 The Gurobi optimizer is a commercial product that is given free for academic use. 
-If you wish to use this optimizer, please go to the website and sign up for an account and active your Gurobi account and license.
+If you wish to use this optimizer,please go to the website and sign up for an account and active your Gurobi account and license.
 
-We noticed that Gurobi was much faster than CBC, especially for size 200 inputs.
+There are instructions at `cloudinstructions.sh`
+
 ## Running the solver
 The solver can be run inside input_generator.
 
@@ -86,6 +87,3 @@ The following will run all the inputs in Phase 2 in the range range `[1,5]` with
 if __name__ == '__main__':
     run_batch_inputs('input folder of .in files', file_range=[1, 5], extensions=['50','100','200'], solver_mode='GRB', time_limit=10000, output_folder="phase2_outputs", log_folder="phase2_log")
 ```
-
-### Compute Used
-We used the CSUA `latte` server for our `200.in` inputs. We used our own laptops for `100.in` and `50.in` inputs.
