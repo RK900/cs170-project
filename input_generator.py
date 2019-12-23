@@ -164,4 +164,4 @@ def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','20
 
 
 if __name__ == '__main__':
-    run_batch_inputs('phase2_inputs', file_range=[258, 258], extensions=['200'],time_limit=50000)
+    run_batch_inputs('phase2_inputs', file_range=[1, 1], extensions=['50'],time_limit=50000)

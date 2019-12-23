@@ -8,7 +8,7 @@ This stitches the closed parts of the loops together
 from output_validator import validate_output
 
 def run_hierholzer(input_file_name, validate=False,full_path=False, output_folder="phase2_outputs", log_folder="phase2_log", input_folder="phase2_inputs"):
-    path = "{}/{}.out".format(phase2_outputs, input_file_name)
+    path = "{}/{}.out".format(output_folder, input_file_name)
     if full_path:
         path = input_file_name
     with open(path, 'r') as f:
