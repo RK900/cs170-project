@@ -17,3 +17,4 @@ source .bashrc
 python3 parse_grb_probe.py <insert key here>
 # get key at https://www.gurobi.com/downloads/end-user-license-agreement-academic/
 # inside your project sudo virtualenv venv --python=python3 and then run tmux session
+# On a server use the gist https://gist.github.com/vikranth22446/8cd039199372f51dc5b1069576b2e7d2
