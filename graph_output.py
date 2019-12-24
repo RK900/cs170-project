@@ -2,7 +2,7 @@ from matplotlib import pyplot
 import networkx as nx
 
 def graph_output(input_file_name):
-    path = "phase2_outputs/{}.out".format(input_file_name)
+    path = input_file_name
     with open(path, 'r') as f:
         content = f.readlines()
     
@@ -20,4 +20,4 @@ def graph_output(input_file_name):
     pyplot.show()
 
 if __name__ == "__main__":
-    graph_output('71_200')
+    graph_output('phase2_outputs/71_200.out')

@@ -5,7 +5,8 @@ Vikranth Srivatsa, Rohan Koodli, Bhuvan Basireddy
 ## Problem Statement
 Given a graph that satisfies the triangle inequality, a start vertex, and list of houses, devise a cycle that drops off everyone such that total cost of everyone walking back to their house and the cost of the car visiting vertices is minimized.
 
-The full spec: https://cs170.org/assets/project/spec.pdf
+The full spec: [Drive Ta Home Spec](spec.pdf)
+
 
 ## Approach
 We attempted to solve this NP-complete problem similiar to the Traveling Salesman Problem (TSP) using linear programming (LP).
@@ -49,41 +50,9 @@ If you wish to use this optimizer,please go to the website and sign up for an ac
 There are instructions at `cloudinstructions.sh`
 
 ## Running the solver
-The solver can be run inside input_generator.
-
-Add the function that you want to run inside __main__ function at the bottom. We plan to move this to accept command line arguments later/moving it to another file.
-### Running a single input file:
-Update input_generator.py with the input_file.
-
-The functions you can run are:
-```python
-def run(args):
-    """
-    input_file: path
-        path to .in file specified in the spec
-    draw: bool
-        draws the result in a networkx graph
-    output_path: path
-        Saves the output of the solver to the specified output file
-    output_log_path: path
-        logs the upper and lower bounds of lp to file
-    solver_mode: str
-        "CBC" if you are using the open source solver. 
-        "GRB" if you have gurobi installed on the computer
-    """
+The solver can be run using the cli
 ```
+python3 main.py run-batch --extensions '["50", "100", "200"]' --input-range '[1,1]'
+```. The other extensions avaiable are time_limit, input_folder, and output_folder.
 
-The fastest way to run the code is below. It will display the optimal path with the variables that are set.
-```python
-if __name__ == '__main__':
-    run('/path/to/store/output/<name>.out')
-```
-
-### Running Batch Function
-The same idea as before but we allow for file ranges and extension types.
-The following will run all the inputs in Phase 2 in the range range `[1,5]` with extensions `50.in`, `100.in`, `200.in` with time_limit 2 hours and 46 seconds.
-
-```python
-if __name__ == '__main__':
-    run_batch_inputs('input folder of .in files', file_range=[1, 5], extensions=['50','100','200'], solver_mode='GRB', time_limit=10000, output_folder="phase2_outputs", log_folder="phase2_log")
-```
+It can also be run by running the input_generator file.

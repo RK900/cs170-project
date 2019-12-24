@@ -9,7 +9,7 @@ from output_validator import validate_output, input_validator
 import utils
 from student_utils import *
 
-def calc_output_file_ratio(output_file, input_folder="phase2_inputs/", outputs_folder="phase2_outputs"):
+def calc_output_file_ratio(output_file, input_folder="phase2_inputs/", outputs_folder="phase2_outputs/"):
     input_file = output_file[:-len(".out")] + ".in"
     input_validator.VALID_FILENAMES.append(input_file)
     msg, calculated_score, err = validate_output(input_folder + input_file, outputs_folder + output_file)
