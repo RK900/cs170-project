@@ -2,7 +2,7 @@ from matplotlib import pyplot
 import networkx as nx
 
 def graph_output(input_file_name):
-    path = "phase2_outputs/{}.out".format(input_file_name)
+    path = input_file_name
     with open(path, 'r') as f:
         content = f.readlines()
     
@@ -15,13 +15,9 @@ def graph_output(input_file_name):
             continue
         G.add_edge(old_route[i - 1], old_route[i])
         edges.append((old_route[i - 1], old_route[i]))
-    # print(edges)
-    # for (u, v) in G.edges():
-    #     if (u,v) in edges:
-            
 
     nx.draw_networkx(G)
     pyplot.show()
 
 if __name__ == "__main__":
-    graph_output('71_200')
+    graph_output('phase2_outputs/71_200.out')

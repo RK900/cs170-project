@@ -9,57 +9,13 @@ import numpy as np
 import glob
 import utils
 from input_validator import quick_validate
-from multi_flow_based_lp_solver import solve
-# from multi_flow_based_lp_solver import build_graph_given, solve, get_path_car_taken_from_vars
+from lp_solver import solve
+
 from student_utils import data_parser
 from utils import build_graph_given, get_path_car_taken_from_vars
-from fix_output import fix_output
+from fix_output import run_hierholzer
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-
-
-def getUUIDLabel():
-	return ''.join(random.choices(ascii_lowercase, k=20))
-
-
-def save_test_to_file(N, num_of_locations=None, num_houses=None, list_locations=None, list_houses=None,
-					  starting_car_location=None,
-					  adjacency_matrix=None, provided_input=False):
-	temp = create_temp_file(N)
-	if not provided_input:
-		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
-			N)
-	temp.writelines(str(num_of_locations) + "\n")
-	temp.writelines(str(num_houses) + "\n")
-	temp.writelines(" ".join(list_locations) + "\n")
-	temp.writelines(" ".join(list_houses) + "\n")
-	temp.writelines(starting_car_location + "\n")
-	temp.writelines("\n".join([" ".join(map(str, row)) for row in adjacency_matrix]))
-
-
-def save_input_to_file(N, num_of_locations=None, num_houses=None, list_locations=None, list_houses=None,
-					   starting_car_location=None,
-					   adjacency_matrix=None, provided_input=False):
-	now = datetime.datetime.now()
-	filename = str(N) + now.strftime('_%B%d_%H%M')
-	path = 'inputs/%s/' % str(N) + filename
-	with open(path + '.in', 'w') as temp:
-		temp.writelines(str(num_of_locations) + "\n")
-		temp.writelines(str(num_houses) + "\n")
-		temp.writelines(" ".join(list_locations) + "\n")
-		temp.writelines(" ".join(list_houses) + "\n")
-		temp.writelines(starting_car_location + "\n")
-		temp.writelines("\n".join([" ".join(map(str, row)) for row in adjacency_matrix]))
-	
-	return path + '.in'
-
-
-def save_temp_output_file(N, path_car_taken, list_drop_of_locs, input_file_name=""):
-	temp = create_temp_file(N, folder="outputs", prefix=input_file_name, file_extension=".out")
-	temp.writelines(" ".join(path_car_taken) + "\n")
-	temp.writelines(str(len(list_drop_of_locs)) + "\n")
-	for drop_of_locs in list_drop_of_locs:
-		temp.writelines(" ".join(drop_of_locs) + "\n")
 
 def make_dir_if_not_exists(path):
 	if not os.path.exists(os.path.dirname(path)):
@@ -68,41 +24,48 @@ def make_dir_if_not_exists(path):
 		except OSError as exc: # Guard against race condition
 			if exc.errno != errno.EEXIST:
 				raise
-	
-def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name="",output_path=""):
+
+def save_input_to_file(N, num_of_locations=None, num_houses=None, list_locations=None, list_houses=None,
+					   starting_car_location=None,
+					   adjacency_matrix=None, provided_input=False, input_folder="tests/inputs"):
 	now = datetime.datetime.now()
 	filename = str(N) + now.strftime('_%B%d_%H%M')
-	path = 'outputs/%s/' % str(N) + filename + '.out'
+	path = f'{input_folder}/{filename}'
+	with open(path + '.in', 'w') as f:
+		f.writelines(str(num_of_locations) + "\n")
+		f.writelines(str(num_houses) + "\n")
+		f.writelines(" ".join(list_locations) + "\n")
+		f.writelines(" ".join(list_houses) + "\n")
+		f.writelines(starting_car_location + "\n")
+		f.writelines("\n".join([" ".join(map(str, row)) for row in adjacency_matrix]))
+	
+	return path + '.in'
+
+def save_output_file(N, path_car_taken, list_drop_of_locs, input_file_name="",output_path="", output_folder="tests/outputs"):
+	now = datetime.datetime.now()
+	filename = str(N) + now.strftime('_%B%d_%H%M')
+	path = f'{output_folder}/{filename}.out'
 	if output_path:
 		path = output_path
 	make_dir_if_not_exists(path)
-	with open(path, 'w') as temp:
-		temp.writelines((" ".join(path_car_taken) + "\n").encode('ascii', 'ignore').decode('ascii'))
-		temp.writelines(str(len(list_drop_of_locs)) + "\n")
+	with open(path, 'w') as f:
+		f.writelines((" ".join(path_car_taken) + "\n").encode('ascii', 'ignore').decode('ascii'))
+		f.writelines(str(len(list_drop_of_locs)) + "\n")
 		for drop_of_locs in list_drop_of_locs:
-			temp.writelines((" ".join(drop_of_locs) + "\n").encode('ascii', 'ignore').decode('ascii'))
-	
+			f.writelines((" ".join(drop_of_locs) + "\n").encode('ascii', 'ignore').decode('ascii'))
 	return path
 
-def create_temp_file(N, folder="inputs", prefix="", file_extension=".in"):
-	curr_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
-	temp_dir = os.path.join(dir_path, folder, str(N))
-	temp = tempfile.NamedTemporaryFile(
-		delete=False, mode='w+t', prefix=prefix + "{}".format(curr_time), dir=temp_dir, suffix=file_extension)
-	return temp
-
-
-def create_valid_test_input(N):
-	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_test_input(
+def create_valid_random_test_input(N):
+	num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = created_random_test_input(
 		N)
 	while not quick_validate(num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
 							 adjacency_matrix):
-		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_test_input(
+		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = created_random_test_input(
 			N)
 	return num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix
 
 
-def create_test_input(N, uniform=True,
+def created_random_test_input(N, uniform=True,
 					  delete_edge_prob=0.2):  # TODO Possible mutate inputs so that good inputs are updated
 	matrix = [[0.0] * N for i in range(N)]
 	for i in range(N):
@@ -158,29 +121,28 @@ def run(input_file="", random=False, size=50, draw=False, output_path="", output
 		The number of seconds to timeout the optimzer. If none is passed, no timelimit.
 	"""
 	if random:
-		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_test_input(
+		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = create_valid_random_test_input(
 			size)
 	else:
-		# print(input_file)
 		input_data = utils.read_file(input_file)
 		num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(
 			input_data)
-	# print("completed input")
+	
 	G, list_locations, list_houses, starting_car_location = build_graph_given(num_of_locations, num_houses,
 																			  list_locations, list_houses,
 																			  starting_car_location, adjacency_matrix)
 	objective_value, objective_bound, x, T = solve(G, list_locations, list_houses, starting_car_location, solver_mode=solver_mode,time_limit=time_limit)
 	path_taken, dropped_off = get_path_car_taken_from_vars(G, x, T, list_locations, list_houses, starting_car_location,
 														   draw=draw)
-	# print(path_taken)
-	# print(dropped_off)
 
 	if random:
-		print('Input file written to: ' + save_input_to_file(size, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
-						  adjacency_matrix, provided_input=True))
+		input_file_loc = save_input_to_file(size, num_of_locations, num_houses, list_locations, list_houses, starting_car_location,
+						  adjacency_matrix, provided_input=True)
+		print('Input file written to: ' + input_file_loc)
+
 	write_path = save_output_file(num_of_locations, path_taken, dropped_off, output_path=output_path)
-	#fix_output(write_path, full_path=True)
-	# print('Output file written to: ' + write_path)
+	run_hierholzer(write_path, full_path=True)
+
 	if output_log_path:
 		make_dir_if_not_exists(output_log_path)
 		with open(output_log_path, 'w') as f:
@@ -188,39 +150,18 @@ def run(input_file="", random=False, size=50, draw=False, output_path="", output
 			f.write('objective bound: ' + str(objective_bound) + '\n')
 
 
-
-		# save_log_path(objective_value, output_path=output_log_path)
-
-
 def run_batch_inputs(input_folder, file_range=[1, 5], extensions=['50','100','200'], solver_mode='GRB', time_limit=10000, output_folder="phase2_outputs", log_folder="phase2_log"):
 	files = []
 	for i in range(file_range[0], file_range[1] + 1):
 		for extension in extensions:
 			files.append("{}_{}".format(i, extension))
+	
 	for input_file in files:
 		print(input_file)
 		if os.path.isfile('{}/{}.in'.format(input_folder, input_file)):
 			run(input_file='{}/{}.in'.format(input_folder, input_file),draw=False,output_path='{}/{}.out'.format(output_folder, input_file), 
 			output_log_path='{}/{}-log.out'.format(log_folder, input_file), solver_mode=solver_mode,time_limit=time_limit)
-	# for file in glob.glob(os.path.join(dir_path, input_folder) + '/[{}-{}].*'.format(range[0],range[1])):
-		# print(file)
 
 
-
-# Possible implement genetic algorthim for improvement
 if __name__ == '__main__':
-    run_batch_inputs('phase2_inputs', file_range=[258, 258], extensions=['200'],time_limit=50000)
-    run_batch_inputs('phase2_inputs', file_range=[271, 271], extensions=['200'],time_limit=50000)
-    
-    # print("Completed input")
-	# run(random=True, size=50, draw=False)
-	# run('inputs/200.in')
-	# print("Completed input")
-	# run('inputs/tests/9_50.in', draw=False)
-	# run('inputs/tests/multiple.in', draw=False)
-	# run('inputs/tests/modified_hourglass.in', draw=True)
-	# run('final_inputs/inputs/200.in')
-	# run(random=True)
-	# run('final_inputs/inputs/200.in')
-	# print(len(list_houses))
-	# run('inputs/tests/test.in', draw=False)
+    run_batch_inputs('phase2_inputs', file_range=[1, 1], extensions=['50'],time_limit=50000)

@@ -1,3 +1,6 @@
+"""
+A quick script to generate inputs that are hourglass form for the project.
+"""
 import networkx as nx
 import scipy as sp
 import random
@@ -67,10 +70,6 @@ def add_walk_home(G, pivot, index):
     return pivot, index
 
 G, pivot, index = initialize_graph()
-# for i in range(3):
-#     pivot, index = add_hourglass(G, pivot, index)
-#     pivot, index = add_hourglass(G, pivot, index)
-#     pivot, index = add_walk_home(G, pivot, index)
 
 for i in range(39):
     r = random.randint(1, 2)
@@ -81,8 +80,7 @@ for i in range(39):
 
 G.add_edge(0, 1, weight=1)
 G.add_edge(1, 0, weight=1)
-# G.add_edge(1, 6, weight=1)
-# G.add_edge(6, 11, weight=1)
+
 f = 1
 while f < index:
     r = random.randint(1, 2)
@@ -94,14 +92,6 @@ while f < index:
         G.add_edge(f+5, f, weight=1)
     f += 5
 
-# G.add_nodes_from([97, 98, 99])
-
-# G.add_edge(97, 98, weight=1)
-# G.add_edge(98, 97, weight=1)
-# G.add_edge(98, 99, weight=1)
-# G.add_edge(99, 98, weight=1)
-# G.add_edge(0, 99, weight=1)
-# G.add_edge(99, 0, weight=1)
 
 # Leftover edges not in hourglass
 G.add_nodes_from(list(range(197, 200)))
