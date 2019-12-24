@@ -1,6 +1,14 @@
+"""
+Implementation of Hierholzer's algorithm to calculate eulerian path given a dfs
+traversal. 
+
+This stitches the closed parts of the loops together
+"""
+
 from output_validator import validate_output
-def fix_output(input_file_name, validate=False,full_path=False):
-    path = "phase2_outputs/{}.out".format(input_file_name)
+
+def run_hierholzer(input_file_name, validate=False,full_path=False, output_folder="phase2_outputs", log_folder="phase2_log", input_folder="phase2_inputs"):
+    path = "{}/{}.out".format(output_folder, input_file_name)
     if full_path:
         path = input_file_name
     with open(path, 'r') as f:
@@ -10,7 +18,7 @@ def fix_output(input_file_name, validate=False,full_path=False):
     old_route = old_route.split()
 
     if old_route[0] == old_route[-1]:
-        print(input_file_name, "already fixed")
+        print(input_file_name, "already fixed output")
         return
     
     new_route =  [old_route[0]]
@@ -40,7 +48,6 @@ def fix_output(input_file_name, validate=False,full_path=False):
 
         new_route = new_route[:ins+1] + local_cycle + new_route[ins+1:]
         path_set.update(local_cycle)
-        # print(new_route)
     
 
     print(' '.join(new_route))
@@ -49,13 +56,13 @@ def fix_output(input_file_name, validate=False,full_path=False):
         f.writelines(content)
     
     if validate:
-        with open("phase2_log/{}-log.out".format(input_file_name), 'r') as f:
+        with open("{}/{}-log.out".format(log_folder, input_file_name), 'r') as f:
             content = f.readlines()
             print(content)
 
-        input_file, output_file = "phase2_inputs/{}.in".format(input_file_name), "phase2_outputs/{}.out".format(input_file_name)
+        input_file, output_file = "{}/{}.in".format(input_folder, input_file_name), "{}/{}.out".format(output_folder, input_file_name)
         validate_output(input_file, output_file, params=[])
 
 
 if __name__ == '__main__':
-    fix_output('324_200', validate=True)
+    run_hierholzer('324_200', validate=True)

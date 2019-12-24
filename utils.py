@@ -133,5 +133,6 @@ def get_path_car_taken_from_vars(g, x, T, list_locations, list_houses, starting_
 			student_drop_off_locations.append(dropped_off)
 	for ta_left in list_drop_of_locs:
 		student_drop_off_locations.append([ta_left, ta_left])
+	
 	return path_car_taken, student_drop_off_locations
 
