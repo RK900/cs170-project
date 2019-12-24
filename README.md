@@ -1,5 +1,5 @@
 # CS 170 Fall 2019 Project
-## Team - Zero Deaths
+## Team - BeastMaster64
 Vikranth Srivatsa, Rohan Koodli, Bhuvan Basireddy
 
 ## Problem Statement
@@ -9,6 +9,8 @@ The full spec: [Drive Ta Home Spec](spec.pdf)
 
 ## Results
 We placed first out of 366 teams in our project.
+![leaderboard](leaderboard.png)
+
 
 ## Approach
 We attempted to solve this NP-complete problem similiar to the Traveling Salesman Problem (TSP) using linear programming (LP).
