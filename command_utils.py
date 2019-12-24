@@ -13,8 +13,8 @@ from colorama import init
 from termcolor import colored
 
 init()
-message_cyan = lambda x: colored(x, 'cyan', attrs=['blink'])
-message_red = lambda x: colored(x, 'red', attrs=['blink'])
+message_cyan = lambda x: colored(x, 'cyan', attrs=[])
+message_red = lambda x: colored(x, 'red', attrs=[])
 
 
 def write_usage(self, prog, args='', prefix='Usage: '):

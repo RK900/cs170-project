@@ -7,6 +7,8 @@ Given a graph that satisfies the triangle inequality, a start vertex, and list o
 
 The full spec: [Drive Ta Home Spec](spec.pdf)
 
+## Results
+We placed first out of 366 teams in our project.
 
 ## Approach
 We attempted to solve this NP-complete problem similiar to the Traveling Salesman Problem (TSP) using linear programming (LP).
@@ -51,6 +53,8 @@ There are instructions at `cloudinstructions.sh`
 
 ## Running the solver
 The solver can be run using the cli
+![CLI](cli.png)
+
 ```
 python3 main.py run-batch --extensions '["50", "100", "200"]' --input-range '[1,1]'
 ```. The other extensions avaiable are time_limit, input_folder, and output_folder.
